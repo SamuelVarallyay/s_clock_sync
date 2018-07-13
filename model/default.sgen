@@ -1,0 +1,20 @@
+GeneratorModel for yakindu::c {
+
+	statechart timesync_master {
+
+		feature Outlet {
+			targetProject = "s_clock_sync"
+			targetFolder = "src-gen"
+			libraryTargetFolder = "src"
+		}
+	}
+
+	statechart timesync_slave {
+
+		feature Outlet {
+			targetProject = "s_clock_sync"
+			targetFolder = "src-gen"
+			libraryTargetFolder = "src"
+		}
+	}
+}
