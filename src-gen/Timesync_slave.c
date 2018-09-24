@@ -1,8 +1,9 @@
 
+#include "Timesync_slave.h"
+#include "..\src\sc_types.h"
+
 #include <stdlib.h>
 #include <string.h>
-#include "..\src\sc_types.h"
-#include "Timesync_slave.h"
 /*! \file Implementation of the state machine 'timesync_slave'
 */
 
@@ -40,6 +41,29 @@ void timesync_slave_enter(Timesync_slave* handle)
 	enseq_sync_default(handle);
 }
 
+void timesync_slave_runCycle(Timesync_slave* handle)
+{
+	clearOutEvents(handle);
+	for (handle->stateConfVectorPosition = 0;
+		handle->stateConfVectorPosition < TIMESYNC_SLAVE_MAX_ORTHOGONAL_STATES;
+		handle->stateConfVectorPosition++)
+		{
+			
+		switch (handle->stateConfVector[handle->stateConfVectorPosition])
+		{
+		case Timesync_slave_sync_a:
+		{
+			react_sync_a(handle);
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	
+	clearInEvents(handle);
+}
+
 void timesync_slave_exit(Timesync_slave* handle)
 {
 	/* Default exit sequence for statechart timesync_slave */
@@ -67,39 +91,6 @@ sc_boolean timesync_slave_isFinal(const Timesync_slave* handle)
    return bool_false;
 }
 
-static void clearInEvents(Timesync_slave* handle)
-{
-}
-
-static void clearOutEvents(Timesync_slave* handle)
-{
-}
-
-void timesync_slave_runCycle(Timesync_slave* handle)
-{
-	
-	clearOutEvents(handle);
-	for (handle->stateConfVectorPosition = 0;
-		handle->stateConfVectorPosition < TIMESYNC_SLAVE_MAX_ORTHOGONAL_STATES;
-		handle->stateConfVectorPosition++)
-		{
-			
-		switch (handle->stateConfVector[handle->stateConfVectorPosition])
-		{
-		case Timesync_slave_sync_a:
-		{
-			react_sync_a(handle);
-			break;
-		}
-		default:
-			break;
-		}
-	}
-	
-	clearInEvents(handle);
-}
-
-
 sc_boolean timesync_slave_isStateActive(const Timesync_slave* handle, Timesync_slaveStates state)
 {
 	sc_boolean result = bool_false;
@@ -114,6 +105,14 @@ sc_boolean timesync_slave_isStateActive(const Timesync_slave* handle, Timesync_s
 			break;
 	}
 	return result;
+}
+
+static void clearInEvents(Timesync_slave* handle)
+{
+}
+
+static void clearOutEvents(Timesync_slave* handle)
+{
 }
 
 

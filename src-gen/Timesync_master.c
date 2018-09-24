@@ -1,9 +1,10 @@
 
+#include "Timesync_master.h"
+#include "..\src\sc_types.h"
+#include "Timesync_masterRequired.h"
+
 #include <stdlib.h>
 #include <string.h>
-#include "..\src\sc_types.h"
-#include "Timesync_master.h"
-#include "Timesync_masterRequired.h"
 /*! \file Implementation of the state machine 'timesync_master'
 */
 
@@ -84,46 +85,8 @@ void timesync_master_enter(Timesync_master* handle)
 	enseq_sync_default(handle);
 }
 
-void timesync_master_exit(Timesync_master* handle)
-{
-	/* Default exit sequence for statechart timesync_master */
-	exseq_sync(handle);
-}
-
-sc_boolean timesync_master_isActive(const Timesync_master* handle)
-{
-	sc_boolean result = bool_false;
-	int i;
-	
-	for(i = 0; i < TIMESYNC_MASTER_MAX_ORTHOGONAL_STATES; i++)
-	{
-		result = result || handle->stateConfVector[i] != Timesync_master_last_state;
-	}
-	
-	return result;
-}
-
-/* 
- * Always returns 'false' since this state machine can never become final.
- */
-sc_boolean timesync_master_isFinal(const Timesync_master* handle)
-{
-   return bool_false;
-}
-
-static void clearInEvents(Timesync_master* handle)
-{
-	handle->iface.syncSent_raised = bool_false;
-	handle->timeEvents.timesync_master_sync_S2_r2_wait_tev0_raised = bool_false;
-}
-
-static void clearOutEvents(Timesync_master* handle)
-{
-}
-
 void timesync_master_runCycle(Timesync_master* handle)
 {
-	
 	clearOutEvents(handle);
 	for (handle->stateConfVectorPosition = 0;
 		handle->stateConfVectorPosition < TIMESYNC_MASTER_MAX_ORTHOGONAL_STATES;
@@ -170,7 +133,34 @@ void timesync_master_runCycle(Timesync_master* handle)
 	clearInEvents(handle);
 }
 
-void timesync_master_raiseTimeEvent(const Timesync_master* handle, sc_eventid evid)
+void timesync_master_exit(Timesync_master* handle)
+{
+	/* Default exit sequence for statechart timesync_master */
+	exseq_sync(handle);
+}
+
+sc_boolean timesync_master_isActive(const Timesync_master* handle)
+{
+	sc_boolean result = bool_false;
+	int i;
+	
+	for(i = 0; i < TIMESYNC_MASTER_MAX_ORTHOGONAL_STATES; i++)
+	{
+		result = result || handle->stateConfVector[i] != Timesync_master_last_state;
+	}
+	
+	return result;
+}
+
+/* 
+ * Always returns 'false' since this state machine can never become final.
+ */
+sc_boolean timesync_master_isFinal(const Timesync_master* handle)
+{
+   return bool_false;
+}
+
+void timesync_master_raiseTimeEvent(Timesync_master* handle, sc_eventid evid)
 {
 	if ( ((sc_intptr_t)evid) >= ((sc_intptr_t)&(handle->timeEvents))
 		&&  ((sc_intptr_t)evid) < ((sc_intptr_t)&(handle->timeEvents)) + sizeof(Timesync_masterTimeEvents))
@@ -217,6 +207,16 @@ sc_boolean timesync_master_isStateActive(const Timesync_master* handle, Timesync
 			break;
 	}
 	return result;
+}
+
+static void clearInEvents(Timesync_master* handle)
+{
+	handle->iface.syncSent_raised = bool_false;
+	handle->timeEvents.timesync_master_sync_S2_r2_wait_tev0_raised = bool_false;
+}
+
+static void clearOutEvents(Timesync_master* handle)
+{
 }
 
 void timesync_masterIface_raise_syncSent(Timesync_master* handle)

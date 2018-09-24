@@ -3,7 +3,7 @@
 #define TIMESYNC_SLAVE_H_
 
 #include "..\src\sc_types.h"
-		
+
 #ifdef __cplusplus
 extern "C" { 
 #endif 
@@ -11,6 +11,12 @@ extern "C" {
 /*! \file Header of the state machine 'timesync_slave'.
 */
 
+/*! Define dimension of the state configuration vector for orthogonal states. */
+#define TIMESYNC_SLAVE_MAX_ORTHOGONAL_STATES 1
+
+
+/*! Define indices of states in the StateConfVector */
+#define SCVI_TIMESYNC_SLAVE_SYNC_A 0
 
 /*! Enumeration of all states */ 
 typedef enum
@@ -19,13 +25,6 @@ typedef enum
 	Timesync_slave_sync_a
 } Timesync_slaveStates;
 
-
-/*! Define dimension of the state configuration vector for orthogonal states. */
-#define TIMESYNC_SLAVE_MAX_ORTHOGONAL_STATES 1
-
-
-/*! Define indices of states in the StateConfVector */
-#define SCVI_TIMESYNC_SLAVE_SYNC_A 0
 
 /*! 
  * Type definition of the data structure for the Timesync_slave state machine.
@@ -37,6 +36,7 @@ typedef struct
 	sc_ushort stateConfVectorPosition; 
 	
 } Timesync_slave;
+
 
 
 /*! Initializes the Timesync_slave state machine data structures. Must be called before first usage.*/
@@ -67,7 +67,6 @@ extern sc_boolean timesync_slave_isFinal(const Timesync_slave* handle);
 
 /*! Checks if the specified state is active (until 2.4.1 the used method for states was called isActive()). */
 extern sc_boolean timesync_slave_isStateActive(const Timesync_slave* handle, Timesync_slaveStates state);
-
 
 
 #ifdef __cplusplus

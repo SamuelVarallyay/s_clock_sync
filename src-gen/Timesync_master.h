@@ -3,7 +3,7 @@
 #define TIMESYNC_MASTER_H_
 
 #include "..\src\sc_types.h"
-		
+
 #ifdef __cplusplus
 extern "C" { 
 #endif 
@@ -11,6 +11,20 @@ extern "C" {
 /*! \file Header of the state machine 'timesync_master'.
 */
 
+/*! Define dimension of the state configuration vector for orthogonal states. */
+#define TIMESYNC_MASTER_MAX_ORTHOGONAL_STATES 2
+
+/*! Define maximum number of time events that can be active at once */
+#define TIMESYNC_MASTER_MAX_PARALLEL_TIME_EVENTS 1
+
+/*! Define indices of states in the StateConfVector */
+#define SCVI_TIMESYNC_MASTER_SYNC_SENDSYNC 0
+#define SCVI_TIMESYNC_MASTER_SYNC_S2 0
+#define SCVI_TIMESYNC_MASTER_SYNC_S2_R1_WAIT 0
+#define SCVI_TIMESYNC_MASTER_SYNC_S2_R1_READY 0
+#define SCVI_TIMESYNC_MASTER_SYNC_S2_R1_SENDFOLLOWUP 0
+#define SCVI_TIMESYNC_MASTER_SYNC_S2_R2_WAIT 1
+#define SCVI_TIMESYNC_MASTER_SYNC_S2_R2_READY 1
 
 /*! Enumeration of all states */ 
 typedef enum
@@ -33,6 +47,8 @@ typedef struct
 	sc_integer errorCode;
 } Timesync_masterIface;
 
+
+
 /*! Type definition of the data structure for the Timesync_masterTimeEvents interface scope. */
 typedef struct
 {
@@ -40,20 +56,7 @@ typedef struct
 } Timesync_masterTimeEvents;
 
 
-/*! Define dimension of the state configuration vector for orthogonal states. */
-#define TIMESYNC_MASTER_MAX_ORTHOGONAL_STATES 2
 
-/*! Define maximum number of time events that can be active at once */
-#define TIMESYNC_MASTER_MAX_PARALLEL_TIME_EVENTS 1
-
-/*! Define indices of states in the StateConfVector */
-#define SCVI_TIMESYNC_MASTER_SYNC_SENDSYNC 0
-#define SCVI_TIMESYNC_MASTER_SYNC_S2 0
-#define SCVI_TIMESYNC_MASTER_SYNC_S2_R1_WAIT 0
-#define SCVI_TIMESYNC_MASTER_SYNC_S2_R1_READY 0
-#define SCVI_TIMESYNC_MASTER_SYNC_S2_R1_SENDFOLLOWUP 0
-#define SCVI_TIMESYNC_MASTER_SYNC_S2_R2_WAIT 1
-#define SCVI_TIMESYNC_MASTER_SYNC_S2_R2_READY 1
 
 /*! 
  * Type definition of the data structure for the Timesync_master state machine.
@@ -69,6 +72,7 @@ typedef struct
 } Timesync_master;
 
 
+
 /*! Initializes the Timesync_master state machine data structures. Must be called before first usage.*/
 extern void timesync_master_init(Timesync_master* handle);
 
@@ -82,7 +86,7 @@ extern void timesync_master_exit(Timesync_master* handle);
 extern void timesync_master_runCycle(Timesync_master* handle);
 
 /*! Raises a time event. */
-extern void timesync_master_raiseTimeEvent(const Timesync_master* handle, sc_eventid evid);
+extern void timesync_master_raiseTimeEvent(Timesync_master* handle, sc_eventid evid);
 
 /*! Raises the in event 'syncSent' that is defined in the default interface scope. */ 
 extern void timesync_masterIface_raise_syncSent(Timesync_master* handle);
@@ -110,7 +114,6 @@ extern sc_boolean timesync_master_isFinal(const Timesync_master* handle);
 
 /*! Checks if the specified state is active (until 2.4.1 the used method for states was called isActive()). */
 extern sc_boolean timesync_master_isStateActive(const Timesync_master* handle, Timesync_masterStates state);
-
 
 
 #ifdef __cplusplus
