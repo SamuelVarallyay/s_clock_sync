@@ -17,7 +17,7 @@ __STATIC_INLINE uint32_t TIMER_CaptureBufGet(TIMER_TypeDef *timer,
 	return timer->CC[ch].CCVB;
 }
 
-volatile bool ovf_cc = false;
+volatile bool ovf_int = false;
 
 void s_clockInit() {
 	CMU_ClockEnable(cmuClock_S_CLOCK_TIMER, true);
@@ -69,6 +69,7 @@ void S_CLOCK_TIMER_IRQHandler(void) {
 		tx_time_stamp.ms_denominator = div;
 	}
 	if (overflow) {
+		ovf_int = true;
 		millisecs = millisecs + 1;
 		estimated_offset += drift_per_milliseconds;
 		int32_t estimated_offset_floor = fixedpt_toint(estimated_offset);
@@ -88,20 +89,19 @@ void S_CLOCK_TIMER_IRQHandler(void) {
 		}
 
 	}
-
-	if (capture_rx && overflow) {
-		ovf_cc = true;
-	}
 }
 
-bool s_clockGetOvfCC() {
+/**
+ * returns true if overflow happened
+ */
+bool s_clockIntReadClear() {
 	bool ret;
-	CORE_ATOMIC_SECTION(ret = ovf_cc; ovf_cc = false;)
+	CORE_ATOMIC_SECTION(ret = ovf_int; ovf_int = false;)
 	return ret;
 }
 
-void s_clockDriftCorrection(fixedpt relative_drift_per_miliseconds) {
-	drift_per_milliseconds += relative_drift_per_miliseconds;
+void s_clockDriftCorrection(fixedpt drift_per_ms) {
+	drift_per_milliseconds = drift_per_ms;
 }
 
 void s_clockDriftReset() {
@@ -112,29 +112,43 @@ void s_clockDriftReset() {
 }
 
 void s_clockSetMillisecs(uint64_t ms) {
-	CORE_ATOMIC_SECTION(millisecs = ms
-	;
-)
+	CORE_irqState_t irqState;
+	irqState = CORE_EnterAtomic();
+	millisecs = ms;
+	CORE_ExitAtomic(irqState);
 }
 
-void s_clockAddMillisecs(uint64_t ms) {
-CORE_ATOMIC_SECTION(millisecs += ms
-;
-)
+void s_clockAddMillisecs(int64_t ms) {
+	CORE_irqState_t irqState;
+	irqState = CORE_EnterAtomic();
+	millisecs += ms;
+	CORE_ExitAtomic(irqState);
+}
+
+void s_clockAddInt(int64_t clock_tick){
+	int64_t ms = clock_tick/CLOCK_FREQUENCY_KHZ;
+	int32_t tick = clock_tick % CLOCK_FREQUENCY_KHZ;
+	estimated_offset += fixedpt_fromint(tick);
+	millisecs += ms;
+
+
 }
 
 s_timeStamp s_clockGetRX_ts() {
-return rx_time_stamp;
+	return rx_time_stamp;
 }
 
 s_timeStamp s_clockGetTX_ts() {
-return tx_time_stamp;
+	return tx_time_stamp;
 }
+
+
 
 uint64_t s_clockGetMillisecs() {
 uint64_t ms;
-CORE_ATOMIC_SECTION(ms = millisecs
-;
-)
+CORE_irqState_t irqState;
+irqState = CORE_EnterAtomic();
+ms = millisecs;
+CORE_ExitAtomic(irqState);
 return ms;
 }

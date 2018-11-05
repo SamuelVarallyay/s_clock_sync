@@ -1,11 +1,11 @@
 GeneratorModel for yakindu::c {
 
-	statechart radio {
+	statechart master_sc {
 
 		feature Outlet {
-			targetProject = "s_clock_sync"
+			targetProject = "test"
 			targetFolder = "src-gen"
-			libraryTargetFolder = "src"
+			libraryTargetFolder = "src-gen"
 		}
 	}
 }

@@ -14,9 +14,9 @@
 
 #include "s_clock.h"
 #include "s_radio.h"
-#include "s_sync_master.h"
-#include "s_sync_slave.h"
+#include "Master_sc.h"
 #include "s_sync.h"
+#include "tdma_params.h"
 
 #include "retargetserial.h"
 
@@ -24,6 +24,14 @@
 /* sniprintf does not process floats, but occupy less flash memory ! */
 #define snprintf    sniprintf
 #endif
+
+typedef struct{
+	uint8_t length;
+	uint8_t source;
+	uint8_t special;
+	s_timeStamp timestamp;
+	uint8_t packet[64];
+}packet_t;
 
 /**************************************************************************//**
  * @brief  Main function of the example.
@@ -53,22 +61,42 @@ int main(void) {
 	} else {
 		printf("Slave\n");
 	}
+
+
 	setup_prs();
 	s_radioInit();
-
 	s_clockInit();
-	if (master) {
-		s_syncMasterFSMinit();
-		while (1) {
-			s_radioLoop();
-			s_syncMasterFSMtask();
+
+	Master_sc master_sc;
+	master_sc_init(&master_sc);
+	master_sc_enter(&master_sc);
+
+	uint32_t slot_num = 0;
+
+	uint8_t packet[64];
+
+	while(1){
+		if(s_clockIntReadClear()){
+			uint64_t ms = s_clockGetMillisecs();
+			if (ms % SLOT_LENGTH == 0){
+				slot_num = (ms / SLOT_LENGTH) % SLOT_NUMBER;
+				master_scIface_raise_tdma_slot(&master_sc, slot_num);
+			}
 		}
-	} else {
-		s_syncSlaveFSMinit();
-		while (1) {
-			s_radioLoop();
-			if (s_clockGetOvfCC()){
-				printf("OvfCC");
+		/*NIRQ is active low*/
+		if(0 == ezradio_hal_NirqLevel()){
+			ezradio_cmd_reply_t interrupt_status;
+			ezradio_get_int_status_fast_clear_read(&interrupt_status);
+			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_PACKET_SENT_PEND_BIT){
+				printf("packet_sent ");
+				master_scIface_raise_packet_sent(&master_sc);
+			}
+			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_PACKET_RX_PEND_BIT){
+				ezradio_read_rx_fifo(64,packet);
+				master_scIface_raise_packet_rx(&master_sc);
+			}
+			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_CRC_ERROR_PEND_BIT){
+
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 #ifndef S_CLOCK_H_
 #define S_CLOCK_H_
 
+#include <stdint.h>
 #include "s_clock_config.h"
 #include "fixedptc.h"
 
@@ -12,12 +13,13 @@ typedef struct{
 }s_timeStamp;
 
 void s_clockInit();
-void s_clockDriftCorrection(fixedpt relative_drift_per_milliseconds);
+void s_clockDriftCorrection(fixedpt drift_per_ms);
 void s_clockDriftReset();
-bool s_clockGetOvfCC();
+bool s_clockIntReadClear();
 
 void s_clockSetMillisecs(uint64_t ms);
-void s_clockAddMillisecs(uint64_t ms);
+void s_clockAddMillisecs(int64_t ms);
+void s_clockAddInt(int64_t tick);
 uint64_t s_clockGetMillisecs();
 s_timeStamp s_clockGetTX_ts();
 s_timeStamp s_clockGetRX_ts();

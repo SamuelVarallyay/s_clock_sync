@@ -1,14 +1,17 @@
 #ifndef S_SYNC_H_
 #define S_SYNC_H_
 
-#define BASE_SYNC_PERIOD_MS 500
+typedef struct{
+	int64_t sync_master;
+	int64_t sync_slave;
+	int32_t delay_req;
+	int32_t delay_resp;
+	int32_t delay;
+	int64_t offset;
+}sync_data_t;
 
-typedef enum{
-	Sync,
-	FollowUp,
-}package_type;
-
-extern uint8_t sync_period_multiplier;
+void calculate_offset(sync_data_t* sync_data);
+void calculate_delay(sync_data_t* sync_data);
 
 void setup_prs();
 
