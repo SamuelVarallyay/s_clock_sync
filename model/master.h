@@ -8,6 +8,9 @@
 #ifndef MODEL_MASTER_H_
 #define MODEL_MASTER_H_
 
+#include "s_sync.h"
+
+void init_master(sync_data_t* syncdata);
 void sendSync();
 void sendFollowUp();
 

@@ -5,19 +5,25 @@
  *      Author: Samu
  */
 
-
+#include <stdio.h>
+#include <stdint.h>
 #include "s_clock.h"
 #include "s_radio.h"
+#include "s_sync.h"
+#include "tdma_params.h"
+
+sync_data_t* sync_data;
+void init_master(sync_data_t* syncdata){
+	sync_data = syncdata;
+}
 
 void sendSync(){
 	printf("Sync ");
-	uint8_t packet[2];
-	packet[0]=2;	//length
-	packet[1]=0;	//source (master=0)
-	ezradio_set_property(EZRADIO_PROP_GRP_ID_PKT, 2u,
-			EZRADIO_PROP_GRP_INDEX_PKT_FIELD_1_LENGTH, 0, 2);
-
-	ezradio_write_tx_fifo(2, packet);
+	packet_t packet = (const packet_t){ 0 };
+	packet.source = 0;
+	packet.type = 0;
+	packet.cycle_start_ms = sync_data->cycle_start_ms;
+	ezradio_write_tx_fifo(64, (uint8_t*)&packet);
 
 	ezradio_start_tx(0, 0x30, 0);
 //	ezradio_start_tx_fast();
@@ -25,15 +31,18 @@ void sendSync(){
 }
 void sendFollowUp(){
 	printf("FoUp ");
-	int64_t tx = s_ts_to_int(s_clockGetTX_ts());
-	uint8_t packet[11];
-	packet[0]=11;	//length
-	packet[1]=0;	//source (master=0)
-	memcpy(packet+2,&tx,sizeof(tx));
-	ezradio_set_property(EZRADIO_PROP_GRP_ID_PKT, 2u,
-			EZRADIO_PROP_GRP_INDEX_PKT_FIELD_1_LENGTH, 0, 11);
+	s_timeStamp ts = s_clockGetTX_ts();
+	ts.ms_whole -= sync_data->cycle_start_ms;
 
-	ezradio_write_tx_fifo(11, packet);
+	int64_t tx = s_ts_to_int(ts);
+	printf("%d ",(int)tx);
+
+	packet_t packet = (const packet_t){ 0 };
+	packet.source = 0;
+	packet.type = 1;
+	packet.sync_master = tx;	//source (master=0)
+
+	ezradio_write_tx_fifo(64, (uint8_t*)&packet);
 
 	ezradio_start_tx(0, 0x30, 0u);
 }

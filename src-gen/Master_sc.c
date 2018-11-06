@@ -186,7 +186,7 @@ void master_scIface_set_i(Master_sc* handle, uint8_t value)
 
 static sc_boolean check_main_region_Sync_tr0_tr0(const Master_sc* handle)
 {
-	return handle->iface.packet_sent_raised;
+	return ((handle->iface.tdma_slot_raised) && (handle->iface.tdma_slot_value == 1)) ? bool_true : bool_false;
 }
 
 static sc_boolean check_main_region_FollowUp_tr0_tr0(const Master_sc* handle)

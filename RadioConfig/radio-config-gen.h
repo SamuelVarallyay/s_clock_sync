@@ -420,7 +420,7 @@
   0x12 /* GROUP: Pkt                                                                                                                                                                                                                                          */,\
   0x01 /* NUM_PROPS                                                                                                                                                                                                                                           */,\
   0x06 /* START_PROP                                                                                                                                                                                                                                          */,\
-  0x80 /* PKT_CONFIG1,PH_FIELD_SPLIT[7],PH_RX_DISABLE[6],4FSK_EN[5],RX_MULTI_PKT[4],MANCH_POL[3],CRC_INVERT[2],CRC_ENDIAN[1],BIT_ORDER[0],PH_FIELD_SPLIT[7],PH_RX_DISABLE[6],4FSK_EN[5],RX_MULTI_PKT[4],MANCH_POL[3],CRC_INVERT[2],CRC_ENDIAN[1],BIT_ORDER[0] */\
+  0x00 /* PKT_CONFIG1,PH_FIELD_SPLIT[7],PH_RX_DISABLE[6],4FSK_EN[5],RX_MULTI_PKT[4],MANCH_POL[3],CRC_INVERT[2],CRC_ENDIAN[1],BIT_ORDER[0],PH_FIELD_SPLIT[7],PH_RX_DISABLE[6],4FSK_EN[5],RX_MULTI_PKT[4],MANCH_POL[3],CRC_INVERT[2],CRC_ENDIAN[1],BIT_ORDER[0] */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_CONFIG1_LEN (5)
@@ -442,7 +442,7 @@
   0x12 /* GROUP: Pkt                                                          */,\
   0x01 /* NUM_PROPS                                                           */,\
   0x08 /* START_PROP                                                          */,\
-  0x2A /* PKT_LEN,INFINITE_LEN[6],ENDIAN[5],SIZE[4],IN_FIFO[3],DST_FIELD[2:0] */\
+  0x00 /* PKT_LEN,INFINITE_LEN[6],ENDIAN[5],SIZE[4],IN_FIFO[3],DST_FIELD[2:0] */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_LEN_LEN (5)
@@ -453,7 +453,7 @@
   0x12 /* GROUP: Pkt                          */,\
   0x01 /* NUM_PROPS                           */,\
   0x09 /* START_PROP                          */,\
-  0x01 /* PKT_LEN_FIELD_SOURCE,SRC_FIELD[2:0] */\
+  0x00 /* PKT_LEN_FIELD_SOURCE,SRC_FIELD[2:0] */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_LEN_FIELD_SOURCE_LEN (5)
@@ -464,7 +464,7 @@
   0x12 /* GROUP: Pkt                     */,\
   0x01 /* NUM_PROPS                      */,\
   0x0A /* START_PROP                     */,\
-  0xFF /* PKT_LEN_ADJUST,LEN_ADJUST[7:0] */\
+  0x00 /* PKT_LEN_ADJUST,LEN_ADJUST[7:0] */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_LEN_ADJUST_LEN (5)
@@ -498,7 +498,7 @@
   0x02 /* NUM_PROPS                                                  */,\
   0x0D /* START_PROP                                                 */,\
   0x00 /* PKT_FIELD_1_LENGTH,FIELD_1_LENGTH[4:0],FIELD_1_LENGTH[7:0] */,\
-  0x80 /* DATA1                                                      */\
+  0x40 /* DATA1                                                      */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_FIELD_1_LENGTH_LEN (6)
@@ -520,7 +520,7 @@
   0x12 /* GROUP: Pkt                                                                                                                                     */,\
   0x01 /* NUM_PROPS                                                                                                                                      */,\
   0x10 /* START_PROP                                                                                                                                     */,\
-  0xA2 /* PKT_FIELD_1_CRC_CONFIG,CRC_START[7],ALT_CRC_START[6],SEND_CRC[5],SEND_ALT_CRC[4],CHECK_CRC[3],CHECK_ALT_CRC[2],CRC_ENABLE[1],ALT_CRC_ENABLE[0] */\
+  0xAA /* PKT_FIELD_1_CRC_CONFIG,CRC_START[7],ALT_CRC_START[6],SEND_CRC[5],SEND_ALT_CRC[4],CHECK_CRC[3],CHECK_ALT_CRC[2],CRC_ENABLE[1],ALT_CRC_ENABLE[0] */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_FIELD_1_CRC_CONFIG_LEN (5)
@@ -668,7 +668,7 @@
   0x02 /* NUM_PROPS                                                           */,\
   0x21 /* START_PROP                                                          */,\
   0x00 /* PKT_RX_FIELD_1_LENGTH,RX_FIELD_1_LENGTH[4:0],RX_FIELD_1_LENGTH[7:0] */,\
-  0x01 /* DATA1                                                               */\
+  0x00 /* DATA1                                                               */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_RX_FIELD_1_LENGTH_LEN (6)
@@ -690,7 +690,7 @@
   0x12 /* GROUP: Pkt                                                                                                            */,\
   0x01 /* NUM_PROPS                                                                                                             */,\
   0x24 /* START_PROP                                                                                                            */,\
-  0x82 /* PKT_RX_FIELD_1_CRC_CONFIG,CRC_START[7],ALT_CRC_START[6],CHECK_CRC[3],CHECK_ALT_CRC[2],CRC_ENABLE[1],ALT_CRC_ENABLE[0] */\
+  0x02 /* PKT_RX_FIELD_1_CRC_CONFIG,CRC_START[7],ALT_CRC_START[6],CHECK_CRC[3],CHECK_ALT_CRC[2],CRC_ENABLE[1],ALT_CRC_ENABLE[0] */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_RX_FIELD_1_CRC_CONFIG_LEN (5)
@@ -702,7 +702,7 @@
   0x02 /* NUM_PROPS                                                           */,\
   0x25 /* START_PROP                                                          */,\
   0x00 /* PKT_RX_FIELD_2_LENGTH,RX_FIELD_2_LENGTH[4:0],RX_FIELD_2_LENGTH[7:0] */,\
-  0x80 /* DATA1                                                               */\
+  0x00 /* DATA1                                                               */\
 }
 
 #define RADIO_CONFIG_SET_PROPERTY_PKT_RX_FIELD_2_LENGTH_LEN (6)
