@@ -33,11 +33,3 @@ void setup_prs(){
 	/* Make sure PRS sensing is enabled (should be by default) */
 	GPIO_InputSenseSet(GPIO_INSENSE_PRS, GPIO_INSENSE_PRS);
 }
-
-void calculate_offset(sync_data_t* sync_data){
-	sync_data->offset = sync_data->sync_slave - sync_data->sync_master - sync_data->delay;
-}
-
-void calculate_delay(sync_data_t* sync_data){
-	sync_data->delay = sync_data->delay_req - sync_data->sync_slave;
-}

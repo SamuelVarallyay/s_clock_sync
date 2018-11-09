@@ -12,7 +12,8 @@
 #include "s_sync.h"
 #include "tdma_params.h"
 
-sync_data_t* sync_data;
+uint8_t sync_packet[64] = {0};
+uint8_t followup_packet[64] = {0};
 void init_master(sync_data_t* syncdata){
 	sync_data = syncdata;
 }

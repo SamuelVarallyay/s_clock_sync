@@ -128,9 +128,13 @@ void s_clockAddMillisecs(int64_t ms) {
 void s_clockAddInt(int64_t clock_tick){
 	int64_t ms = clock_tick/CLOCK_FREQUENCY_KHZ;
 	int32_t tick = clock_tick % CLOCK_FREQUENCY_KHZ;
-	estimated_offset += fixedpt_fromint(tick);
 	millisecs += ms;
-
+	if (tick >= 0){
+		estimated_offset += fixedpt_fromint(tick);
+	}else{
+		estimated_offset += fixedpt_fromint(CLOCK_FREQUENCY_KHZ + tick);
+		millisecs--;
+	}
 
 }
 

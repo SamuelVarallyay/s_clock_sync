@@ -46,15 +46,21 @@ int main(void) {
 
 	bool master = DEVINFO->UNIQUEL == 0x790ab;
 
+	Master_sc master_sc;
+
 	/* Print header */
 	printf("Clock Sync init\n");
 	printf("UIDL: 0x%08x\n", (unsigned) DEVINFO->UNIQUEL);
 	if (master) {
 		printf("Master\n");
+		init_master(sync_data_t* sync_data);
+		master_sc_init(&master_sc);
+		master_sc_enter(&master_sc);
 	} else {
 		printf("Slave\n");
 	}
 
+	packet_t rx_packet;
 
 	setup_prs();
 	s_radioInit();
@@ -63,14 +69,7 @@ int main(void) {
 	sync_data_t sync_data = (const sync_data_t){0};
 	sync_data.delay = -1500;
 
-	init_master(sync_data_t* sync_data);
-	Master_sc master_sc;
-	master_sc_init(&master_sc);
-	master_sc_enter(&master_sc);
-
 	uint32_t slot_num = 0;
-
-	packet_t rx_packet;
 
 	while(1){
 		if(s_clockIntReadClear()){
@@ -80,7 +79,9 @@ int main(void) {
 				if (slot_num == 0){
 					sync_data.cycle_start_ms = ms;
 				}
+				if (master) {
 				master_scIface_raise_tdma_slot(&master_sc, slot_num);
+				}
 			}
 		}
 		/*NIRQ is active low*/
@@ -89,19 +90,16 @@ int main(void) {
 			ezradio_get_int_status_fast_clear_read(&interrupt_status);
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_PACKET_SENT_PEND_BIT){
 				printf("packet_sent\n");
+				if (master) {
 				master_scIface_raise_packet_sent(&master_sc);
+				}
 			}
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_PACKET_RX_PEND_BIT){
 				ezradio_read_rx_fifo(64, (uint8_t*)&rx_packet);
 
-				if(rx_packet.source == 0){
-					if(rx_packet.type == 0){
-
-					}else{
-
-					}
-				}
+				if (master) {
 				master_scIface_raise_packet_rx(&master_sc);
+				}
 			}
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_CRC_ERROR_PEND_BIT){
 
