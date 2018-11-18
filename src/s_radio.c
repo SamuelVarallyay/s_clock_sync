@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 #include "em_gpio.h"
 #include "s_radio.h"

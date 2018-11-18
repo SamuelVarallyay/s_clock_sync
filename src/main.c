@@ -53,21 +53,18 @@ int main(void) {
 	printf("UIDL: 0x%08x\n", (unsigned) DEVINFO->UNIQUEL);
 	if (master) {
 		printf("Master\n");
-		init_master(sync_data_t* sync_data);
 		master_sc_init(&master_sc);
 		master_sc_enter(&master_sc);
 	} else {
 		printf("Slave\n");
 	}
 
-	packet_t rx_packet;
+	uint8_t rx_packet[64];
 
 	setup_prs();
 	s_radioInit();
 	s_clockInit();
 
-	sync_data_t sync_data = (const sync_data_t){0};
-	sync_data.delay = -1500;
 
 	uint32_t slot_num = 0;
 
@@ -76,9 +73,6 @@ int main(void) {
 			uint64_t ms = s_clockGetMillisecs();
 			if (ms % SLOT_LENGTH == 0){
 				slot_num = (ms / SLOT_LENGTH) % SLOT_NUMBER;
-				if (slot_num == 0){
-					sync_data.cycle_start_ms = ms;
-				}
 				if (master) {
 				master_scIface_raise_tdma_slot(&master_sc, slot_num);
 				}
@@ -95,11 +89,9 @@ int main(void) {
 				}
 			}
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_PACKET_RX_PEND_BIT){
-				ezradio_read_rx_fifo(64, (uint8_t*)&rx_packet);
+				ezradio_read_rx_fifo(64, rx_packet);
+				timestamp = s_ts_to_int(s_clockGetRX_ts());
 
-				if (master) {
-				master_scIface_raise_packet_rx(&master_sc);
-				}
 			}
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_CRC_ERROR_PEND_BIT){
 

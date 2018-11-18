@@ -3,6 +3,7 @@
 #define MASTER_SC_H_
 
 #include "sc_types.h"
+#include <s_sync.h>
 #include "..\model\master.h"
 
 #ifdef __cplusplus
@@ -26,6 +27,9 @@ extern "C" {
 #define SCVI_MASTER_SC_MAIN_REGION_SYNC 0
 #define SCVI_MASTER_SC_MAIN_REGION_FOLLOWUP 0
 #define SCVI_MASTER_SC_MAIN_REGION_RX 0
+#define SCVI_MASTER_SC_MAIN_REGION_INIT 0
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_TIMESTAMP 0
+#define SCVI_MASTER_SC_MAIN_REGION_SLOT_START 0
 
 
 /*! Enumeration of all states */ 
@@ -34,8 +38,13 @@ typedef enum
 	Master_sc_last_state,
 	Master_sc_main_region_Sync,
 	Master_sc_main_region_FollowUp,
-	Master_sc_main_region_rx
+	Master_sc_main_region_rx,
+	Master_sc_main_region_init,
+	Master_sc_main_region_sync_timestamp,
+	Master_sc_main_region_slot_start
 } Master_scStates;
+
+
 
 
 
@@ -45,11 +54,22 @@ typedef enum
 typedef struct
 {
 	sc_boolean packet_sent_raised;
-	sc_boolean packet_rx_raised;
+	uint64_t packet_sent_value;
+	sc_boolean packet_received_raised;
+	uint64_t packet_received_value;
 	sc_boolean tdma_slot_raised;
 	uint8_t tdma_slot_value;
-	uint8_t i;
+	uint8_t * rx_packet;
 } Master_scIface;
+
+
+
+/*! Type definition of the data structure for the Master_scInternal interface scope. */
+typedef struct
+{
+	uint64_t sync_sent_ts;
+	uint8_t slave_index;
+} Master_scInternal;
 
 
 
@@ -64,6 +84,7 @@ typedef struct
 	sc_ushort stateConfVectorPosition; 
 	
 	Master_scIface iface;
+	Master_scInternal internal;
 } Master_sc;
 
 
@@ -82,18 +103,18 @@ extern void master_sc_runCycle(Master_sc* handle);
 
 
 /*! Raises the in event 'packet_sent' that is defined in the default interface scope. */ 
-extern void master_scIface_raise_packet_sent(Master_sc* handle);
+extern void master_scIface_raise_packet_sent(Master_sc* handle, uint64_t value);
 
-/*! Raises the in event 'packet_rx' that is defined in the default interface scope. */ 
-extern void master_scIface_raise_packet_rx(Master_sc* handle);
+/*! Raises the in event 'packet_received' that is defined in the default interface scope. */ 
+extern void master_scIface_raise_packet_received(Master_sc* handle, uint64_t value);
 
 /*! Raises the in event 'tdma_slot' that is defined in the default interface scope. */ 
 extern void master_scIface_raise_tdma_slot(Master_sc* handle, uint8_t value);
 
-/*! Gets the value of the variable 'i' that is defined in the default interface scope. */ 
-extern uint8_t master_scIface_get_i(const Master_sc* handle);
-/*! Sets the value of the variable 'i' that is defined in the default interface scope. */ 
-extern void master_scIface_set_i(Master_sc* handle, uint8_t value);
+/*! Gets the value of the variable 'rx_packet' that is defined in the default interface scope. */ 
+extern uint8_t * master_scIface_get_rx_packet(const Master_sc* handle);
+/*! Sets the value of the variable 'rx_packet' that is defined in the default interface scope. */ 
+extern void master_scIface_set_rx_packet(Master_sc* handle, uint8_t * value);
 
 /*!
  * Checks whether the state machine is active (until 2.4.1 this method was used for states).

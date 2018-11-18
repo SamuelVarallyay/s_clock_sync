@@ -9,9 +9,9 @@
 
 #include "controller.h"
 
-void PIcontroller(PIcontroller_t* ctrl,float input){
-	float P = input;
-	ctrl->I = ctrl->I + input;
+float PIcontroller(PIcontroller_t* ctrl,float input){
+	float P  = ctrl->Kp * input;
+	ctrl->I += ctrl->Ki * input;
 
-	float output = ctrl->Kp * P + ctrl->Ki * ctrl->I;
+	return  P + ctrl->I;
 }

@@ -14,6 +14,6 @@ typedef struct{
 	float I;
 }PIcontroller_t;
 
-void PIcontroller(PIcontroller_t* ctrl, float input);
+float PIcontroller(PIcontroller_t* ctrl, float input);
 
 #endif /* SRC_CONTROLLER_H_ */

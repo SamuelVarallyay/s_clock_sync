@@ -95,6 +95,9 @@ typedef	__uint128_t fixedptud;
 #define fixedpt_rconst(R) ((fixedpt)((R) * (((fixedptd)1 << FIXEDPT_FBITS) \
 	+ ((R) >= 0 ? 0.5 : -0.5))))
 #define fixedpt_fromint(I) ((fixedptd)(I) << FIXEDPT_FBITS)
+/////////////////////
+//#define fixedpt_fromfloat(FL) ((fixedptd)((FL) * (1<<FIXEDPT_FBITS)))
+/////////////////////
 #define fixedpt_toint(F) ((F) >> FIXEDPT_FBITS)
 #define fixedpt_add(A,B) ((A) + (B))
 #define fixedpt_sub(A,B) ((A) - (B))
@@ -113,6 +116,12 @@ typedef	__uint128_t fixedptud;
 #define FIXEDPT_E	fixedpt_rconst(2.7182818284590452354)
 
 #define fixedpt_abs(A) ((A) < 0 ? -(A) : (A))
+
+fixedpt fixedpt_fromfloat(float fl);
+
+static inline fixedpt fixedpt_fromfloat(float fl){
+	return (fixedpt)(fl * (1<<FIXEDPT_FBITS));
+}
 
 
 /* Multiplies two fixedpt numbers, returns the result. */
