@@ -1,11 +1,11 @@
 #ifndef S_SYNC_H_
 #define S_SYNC_H_
 
-#include <stdint.h>
-
 #define	SYNC 0
 #define	FOLLOW_UP 1
 #define	DATA 2
+
+#include <stdint.h>
 
 void setup_prs();
 

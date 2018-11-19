@@ -8,4 +8,12 @@ GeneratorModel for yakindu::c {
 			libraryTargetFolder = "src-gen"
 		}
 	}
+	statechart slave_sc {
+
+		feature Outlet {
+			targetProject = "test"
+			targetFolder = "src-gen"
+			libraryTargetFolder = "src-gen"
+		}
+	}
 }
