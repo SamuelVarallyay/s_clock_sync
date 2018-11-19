@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmlns:sgraph="http://www.yakindu.org/sct/sgraph/2.0.0">
-  <sgraph:Statechart xmi:id="_B4EXsNVUEeiSs4DiSAeLPQ" specification="@EventDriven&#xA;// Use the event driven execution model.&#xA;// Runs a run-to-completion step&#xA;// each time an event is raised.&#xA;// Switch to cycle based behavior&#xA;// by specifying '@CycleBased(200)'&#xA;// instead.&#xA;&#xA;@ChildFirstExecution&#xA;// In composite states, execute&#xA;// child states first.&#xA;// @ParentFirstExecution does the opposite.&#xA;import: &quot;slave.h&quot;&#xA;import: &quot;tdma_params.h&quot;&#xA;import: &quot;s_sync.h&quot;&#xA;import: &quot;s_clock.h&quot;&#xA;import: &quot;controller.h&quot;&#xA;import: &quot;fixedptc.h&quot;&#xA;&#xA;interface:&#xA;&#x9;in event packet_sent: int64_t&#xA;&#x9;in event packet_received: int64_t&#xA;&#x9;in event tdma_slot: uint8_t&#xA;&#x9;var rx_packet: pointer&lt;uint8_t>&#xA;&#x9;var slave_id: uint8_t&#xA;internal:&#xA;&#x9;event slave_slot&#xA;&#x9;event sync_slot&#xA;&#x9;event followup_slot&#xA;&#x9;event sync_received&#xA;&#x9;event followup_received&#xA;&#x9;var sync_tx_ts: int64_t&#xA;&#x9;var sync_rx_ts: int64_t&#xA;&#x9;var slave_time_diff: int32_t&#xA;&#x9;var master_time_diff: int32_t&#xA;&#x9;var offset: int64_t&#xA;&#x9;var delay: int32_t&#xA;&#x9;var PIctrl: PIcontroller_t&#xA;&#x9;var drift: float" name="slave" domainID="com.yakindu.domain.c">
+  <sgraph:Statechart xmi:id="_B4EXsNVUEeiSs4DiSAeLPQ" specification="@EventDriven&#xA;// Use the event driven execution model.&#xA;// Runs a run-to-completion step&#xA;// each time an event is raised.&#xA;// Switch to cycle based behavior&#xA;// by specifying '@CycleBased(200)'&#xA;// instead.&#xA;&#xA;@ChildFirstExecution&#xA;// In composite states, execute&#xA;// child states first.&#xA;// @ParentFirstExecution does the opposite.&#xA;import: &quot;slave.h&quot;&#xA;import: &quot;tdma_params.h&quot;&#xA;import: &quot;s_sync.h&quot;&#xA;import: &quot;s_clock.h&quot;&#xA;import: &quot;controller.h&quot;&#xA;import: &quot;fixedptc.h&quot;&#xA;&#xA;interface:&#xA;&#x9;in event packet_sent: int64_t&#xA;&#x9;in event packet_received: int64_t&#xA;&#x9;in event tdma_slot: uint8_t&#xA;&#x9;var rx_packet: pointer&lt;uint8_t>&#xA;&#x9;var slave_index: uint8_t&#xA;internal:&#xA;&#x9;event slave_slot&#xA;&#x9;event sync_slot&#xA;&#x9;event followup_slot&#xA;&#x9;var sync_tx_ts: int64_t&#xA;&#x9;var sync_rx_ts: int64_t&#xA;&#x9;var slave_time_diff: int32_t&#xA;&#x9;var master_time_diff: int32_t&#xA;&#x9;var offset: int64_t&#xA;&#x9;var delay: int32_t&#xA;&#x9;var PIctrl: PIcontroller_t&#xA;&#x9;var drift: float" name="slave" domainID="com.yakindu.domain.c">
     <regions xmi:id="_B4enY9VUEeiSs4DiSAeLPQ" name="main region">
       <vertices xsi:type="sgraph:Entry" xmi:id="_B4hDoNVUEeiSs4DiSAeLPQ">
         <outgoingTransitions xmi:id="_B4kG8tVUEeiSs4DiSAeLPQ" target="_B4hqt9VUEeiSs4DiSAeLPQ"/>
       </vertices>
-      <vertices xsi:type="sgraph:State" xmi:id="_B4hqt9VUEeiSs4DiSAeLPQ" specification="entry/&#xD;&#xA;setSourceAddress(tx_packet,slave_id);&#xD;&#xA;setPacketType(tx_packet, DATA);&#xD;&#xA;PIctrl.Ki = 1/4;&#xD;&#xA;PIctrl.Kp = 1/16" name="init" incomingTransitions="_B4kG8tVUEeiSs4DiSAeLPQ">
+      <vertices xsi:type="sgraph:State" xmi:id="_B4hqt9VUEeiSs4DiSAeLPQ" specification="entry /&#xD;&#xA;setSourceAddress(tx_packet,slave_index+1);&#xD;&#xA;setPacketType(tx_packet, DATA);&#xD;&#xA;PIctrl.Ki = 1/4;&#xD;&#xA;PIctrl.Kp = 1/16" name="init" incomingTransitions="_B4kG8tVUEeiSs4DiSAeLPQ">
         <outgoingTransitions xmi:id="_8IB2QOtNEeiP3IAYXHZaiA" specification="always" target="_JgTUYOtNEeiP3IAYXHZaiA"/>
       </vertices>
       <vertices xsi:type="sgraph:State" xmi:id="_NDdLcNXrEeiSs4DiSAeLPQ" specification="" name="wait for followup" incomingTransitions="_GCVjQOtOEeiP3IAYXHZaiA">
@@ -17,7 +17,7 @@
             <outgoingTransitions xmi:id="_inBFwOp_Eei1W7n23X5LFw" specification="tdma_slot" target="_f94gUOp_Eei1W7n23X5LFw"/>
           </vertices>
           <vertices xsi:type="sgraph:Choice" xmi:id="_f94gUOp_Eei1W7n23X5LFw" incomingTransitions="_inBFwOp_Eei1W7n23X5LFw">
-            <outgoingTransitions xmi:id="_n80FwOp_Eei1W7n23X5LFw" specification="[valueof(tdma_slot) == slave_id]/&#xD;&#xA;raise slave_slot" target="_3il9QOp-Eei1W7n23X5LFw"/>
+            <outgoingTransitions xmi:id="_n80FwOp_Eei1W7n23X5LFw" specification="[valueof(tdma_slot) == (slave_index+2)] /&#xD;&#xA;raise slave_slot" target="_3il9QOp-Eei1W7n23X5LFw"/>
             <outgoingTransitions xmi:id="_xY_FQOp_Eei1W7n23X5LFw" specification="[valueof(tdma_slot) == 0]/&#xD;&#xA;startRx();raise sync_slot" target="_3il9QOp-Eei1W7n23X5LFw"/>
             <outgoingTransitions xmi:id="_jdVNQOqAEei1W7n23X5LFw" specification="[valueof(tdma_slot) == 1]/&#xD;&#xA;startRx();raise followup_slot" target="_3il9QOp-Eei1W7n23X5LFw"/>
             <outgoingTransitions xmi:id="_w4uWMOqSEei1W7n23X5LFw" specification="else" target="_3il9QOp-Eei1W7n23X5LFw"/>
@@ -39,7 +39,7 @@
         </regions>
         <regions xmi:id="_Wud7oOtJEei1W7n23X5LFw" name="sync">
           <vertices xsi:type="sgraph:State" xmi:id="_Be8NYOtKEei1W7n23X5LFw" name="wait for sync" incomingTransitions="_D6gQ4OtKEei1W7n23X5LFw _-pr3hOtJEei1W7n23X5LFw">
-            <outgoingTransitions xmi:id="_-pr3hOtJEei1W7n23X5LFw" specification="packet_received [getPacketType(rx_packet) == SYNC]/&#xD;&#xA;&#xD;&#xA;sync_rx_ts = valueof(packet_received);&#xD;&#xA;master_time_diff = getDelayResp(rx_packet,slave_id) as int32_t;&#xD;&#xA;delay = (master_time_diff - slave_time_diff) /2" target="_Be8NYOtKEei1W7n23X5LFw"/>
+            <outgoingTransitions xmi:id="_-pr3hOtJEei1W7n23X5LFw" specification="packet_received [getPacketType(rx_packet) == SYNC] /&#xD;&#xA;&#xD;&#xA;sync_rx_ts = valueof(packet_received);&#xD;&#xA;master_time_diff = getDelayResp(rx_packet,slave_index) as int32_t;&#xD;&#xA;delay = (master_time_diff - slave_time_diff) /2" target="_Be8NYOtKEei1W7n23X5LFw"/>
           </vertices>
           <vertices xsi:type="sgraph:Entry" xmi:id="_DOL9cOtKEei1W7n23X5LFw">
             <outgoingTransitions xmi:id="_D6gQ4OtKEei1W7n23X5LFw" specification="" target="_Be8NYOtKEei1W7n23X5LFw"/>
@@ -110,7 +110,7 @@
           <styles xsi:type="notation:FontStyle" xmi:id="_B4iRxNVUEeiSs4DiSAeLPQ"/>
           <styles xsi:type="notation:BooleanValueStyle" xmi:id="_B4kG8NVUEeiSs4DiSAeLPQ" name="isHorizontal" booleanValue="true"/>
           <styles xsi:type="notation:StringValueStyle" xmi:id="_hwNYpudVEeiInNNKMgBzSg" name="featureToShow" stringValue="specification"/>
-          <layoutConstraint xsi:type="notation:Bounds" xmi:id="_B4kG8dVUEeiSs4DiSAeLPQ" x="76" y="56" width="297" height="105"/>
+          <layoutConstraint xsi:type="notation:Bounds" xmi:id="_B4kG8dVUEeiSs4DiSAeLPQ" x="76" y="56" width="347" height="105"/>
         </children>
         <children xmi:id="_NDfAoNXrEeiSs4DiSAeLPQ" type="State" element="_NDdLcNXrEeiSs4DiSAeLPQ">
           <children xsi:type="notation:DecorationNode" xmi:id="_NDfnsNXrEeiSs4DiSAeLPQ" type="StateName">
@@ -410,7 +410,7 @@
       <styles xsi:type="notation:StringValueStyle" xmi:id="_hw8_gOdVEeiInNNKMgBzSg" name="featureToShow" stringValue="specification"/>
       <bendpoints xsi:type="notation:RelativeBendpoints" xmi:id="_B4lVEtVUEeiSs4DiSAeLPQ" points="[0, 7, 21, -82]$[0, 65, 21, -24]"/>
       <sourceAnchor xsi:type="notation:IdentityAnchor" xmi:id="_q4LPsubGEeiInNNKMgBzSg" id="(0.5,0.5)"/>
-      <targetAnchor xsi:type="notation:IdentityAnchor" xmi:id="_FuyxoNVUEeiSs4DiSAeLPQ" id="(0.3955479452054795,0.5099999999999999)"/>
+      <targetAnchor xsi:type="notation:IdentityAnchor" xmi:id="_FuyxoNVUEeiSs4DiSAeLPQ" id="(0.3377192982456141,0.5099999999999999)"/>
     </edges>
     <edges xmi:id="_iMTBYN6GEeiXB7rXcoDgIg" type="Transition" element="_iMP-EN6GEeiXB7rXcoDgIg" source="_JgUigOtNEeiP3IAYXHZaiA" target="_3yuC4OtNEeiP3IAYXHZaiA">
       <children xsi:type="notation:DecorationNode" xmi:id="_iMUPgN6GEeiXB7rXcoDgIg" type="TransitionExpression">
@@ -465,7 +465,7 @@
     <edges xmi:id="_n80s0Op_Eei1W7n23X5LFw" type="Transition" element="_n80FwOp_Eei1W7n23X5LFw" source="_DNoucetLEeiP3IAYXHZaiA" target="_DNouZetLEeiP3IAYXHZaiA">
       <children xsi:type="notation:DecorationNode" xmi:id="_n80s1Op_Eei1W7n23X5LFw" type="TransitionExpression">
         <styles xsi:type="notation:ShapeStyle" xmi:id="_n80s1ep_Eei1W7n23X5LFw"/>
-        <layoutConstraint xsi:type="notation:Location" xmi:id="_n80s1up_Eei1W7n23X5LFw" x="53" y="21"/>
+        <layoutConstraint xsi:type="notation:Location" xmi:id="_n80s1up_Eei1W7n23X5LFw" x="62" y="-15"/>
       </children>
       <styles xsi:type="notation:ConnectorStyle" xmi:id="_n80s0ep_Eei1W7n23X5LFw" routing="Rectilinear" lineColor="4210752"/>
       <styles xsi:type="notation:FontStyle" xmi:id="_n80s0-p_Eei1W7n23X5LFw" fontName="Verdana"/>
@@ -542,7 +542,7 @@
     <edges xmi:id="_-prQc-tJEei1W7n23X5LFw" type="Transition" element="_-pr3hOtJEei1W7n23X5LFw" source="_Be80cutKEei1W7n23X5LFw" target="_Be80cutKEei1W7n23X5LFw">
       <children xsi:type="notation:DecorationNode" xmi:id="_-pr3getJEei1W7n23X5LFw" type="TransitionExpression">
         <styles xsi:type="notation:ShapeStyle" xmi:id="_-pr3g-tJEei1W7n23X5LFw"/>
-        <layoutConstraint xsi:type="notation:Location" xmi:id="_-pr3gutJEei1W7n23X5LFw" x="2" y="-219"/>
+        <layoutConstraint xsi:type="notation:Location" xmi:id="_-pr3gutJEei1W7n23X5LFw" x="12" y="-220"/>
       </children>
       <styles xsi:type="notation:ConnectorStyle" xmi:id="_-pr3gOtJEei1W7n23X5LFw" routing="Rectilinear" lineColor="4210752"/>
       <styles xsi:type="notation:FontStyle" xmi:id="_-prQd-tJEei1W7n23X5LFw" fontName="Verdana"/>
@@ -599,7 +599,7 @@
       <styles xsi:type="notation:ConnectorStyle" xmi:id="_8ICdUetNEeiP3IAYXHZaiA" routing="Rectilinear" lineColor="4210752"/>
       <styles xsi:type="notation:FontStyle" xmi:id="_8ICdU-tNEeiP3IAYXHZaiA" fontName="Verdana"/>
       <bendpoints xsi:type="notation:RelativeBendpoints" xmi:id="_8ICdUutNEeiP3IAYXHZaiA" points="[11, 26, -3, -102]$[11, 104, -3, -24]"/>
-      <sourceAnchor xsi:type="notation:IdentityAnchor" xmi:id="_8IESgOtNEeiP3IAYXHZaiA" id="(0.1447811447811448,0.881344537815126)"/>
+      <sourceAnchor xsi:type="notation:IdentityAnchor" xmi:id="_8IESgOtNEeiP3IAYXHZaiA" id="(0.12361431074881367,0.881344537815126)"/>
     </edges>
     <edges xmi:id="_GCWxYOtOEeiP3IAYXHZaiA" type="Transition" element="_GCVjQOtOEeiP3IAYXHZaiA" source="_3yuC4OtNEeiP3IAYXHZaiA" target="_NDfAoNXrEeiSs4DiSAeLPQ">
       <children xsi:type="notation:DecorationNode" xmi:id="_GCWxZOtOEeiP3IAYXHZaiA" type="TransitionExpression">
