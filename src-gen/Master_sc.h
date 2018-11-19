@@ -20,28 +20,60 @@ extern "C" {
 #define SC_INVALID_EVENT_VALUE 0
 #endif
 /*! Define dimension of the state configuration vector for orthogonal states. */
-#define MASTER_SC_MAX_ORTHOGONAL_STATES 1
+#define MASTER_SC_MAX_ORTHOGONAL_STATES 4
 
 
 /*! Define indices of states in the StateConfVector */
-#define SCVI_MASTER_SC_MAIN_REGION_SYNC 0
-#define SCVI_MASTER_SC_MAIN_REGION_FOLLOWUP 0
-#define SCVI_MASTER_SC_MAIN_REGION_RX 0
 #define SCVI_MASTER_SC_MAIN_REGION_INIT 0
-#define SCVI_MASTER_SC_MAIN_REGION_SYNC_TIMESTAMP 0
-#define SCVI_MASTER_SC_MAIN_REGION_SLOT_START 0
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC 0
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_TDMA_ACTIVE 0
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_SYNC_SLOT_SYNC 1
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_SYNC_SLOT_WAIT 1
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_FOLLOW_UP_SLOT_FOLLOW_UP 2
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_FOLLOW_UP_SLOT_WAIT 2
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_SLAVE_WAIT_SLAVE 3
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_SLAVE_WAIT 3
 
 
+/*
+ * Enum of event names in the statechart.
+ */
+typedef enum  {
+	master_sc_invalid_event = SC_INVALID_EVENT_VALUE,
+	master_scInternal_slave_slot,
+	master_scInternal_sync_slot,
+	master_scInternal_followup_slot
+} master_sc_event_name;
+
+/*
+ * Struct that represents a single event.
+ */
+typedef struct {
+	master_sc_event_name name;
+} master_sc_internal_event;
+
+/*
+ * Queue that holds the raised events.
+ */
+typedef struct master_sc_eventqueue_s {
+	master_sc_internal_event events[MASTER_SC_EVENTQUEUE_BUFFERSIZE];
+	sc_integer pop_index;
+	sc_integer push_index;
+	sc_integer size;
+} master_sc_eventqueue;
 /*! Enumeration of all states */ 
 typedef enum
 {
 	Master_sc_last_state,
-	Master_sc_main_region_Sync,
-	Master_sc_main_region_FollowUp,
-	Master_sc_main_region_rx,
 	Master_sc_main_region_init,
-	Master_sc_main_region_sync_timestamp,
-	Master_sc_main_region_slot_start
+	Master_sc_main_region_sync,
+	Master_sc_main_region_sync_tdma_active,
+	Master_sc_main_region_sync_Sync_slot_Sync,
+	Master_sc_main_region_sync_Sync_slot_wait,
+	Master_sc_main_region_sync_Follow_up_slot_Follow_Up,
+	Master_sc_main_region_sync_Follow_up_slot_wait,
+	Master_sc_main_region_sync_slave_wait_slave,
+	Master_sc_main_region_sync_slave_wait
 } Master_scStates;
 
 
@@ -54,9 +86,9 @@ typedef enum
 typedef struct
 {
 	sc_boolean packet_sent_raised;
-	uint64_t packet_sent_value;
+	int64_t packet_sent_value;
 	sc_boolean packet_received_raised;
-	uint64_t packet_received_value;
+	int64_t packet_received_value;
 	sc_boolean tdma_slot_raised;
 	uint8_t tdma_slot_value;
 	uint8_t * rx_packet;
@@ -67,8 +99,11 @@ typedef struct
 /*! Type definition of the data structure for the Master_scInternal interface scope. */
 typedef struct
 {
-	uint64_t sync_sent_ts;
+	int64_t sync_tx_ts;
 	uint8_t slave_index;
+	sc_boolean slave_slot_raised;
+	sc_boolean sync_slot_raised;
+	sc_boolean followup_slot_raised;
 } Master_scInternal;
 
 
@@ -85,6 +120,7 @@ typedef struct
 	
 	Master_scIface iface;
 	Master_scInternal internal;
+	master_sc_eventqueue internal_event_queue;
 } Master_sc;
 
 
@@ -103,10 +139,10 @@ extern void master_sc_runCycle(Master_sc* handle);
 
 
 /*! Raises the in event 'packet_sent' that is defined in the default interface scope. */ 
-extern void master_scIface_raise_packet_sent(Master_sc* handle, uint64_t value);
+extern void master_scIface_raise_packet_sent(Master_sc* handle, int64_t value);
 
 /*! Raises the in event 'packet_received' that is defined in the default interface scope. */ 
-extern void master_scIface_raise_packet_received(Master_sc* handle, uint64_t value);
+extern void master_scIface_raise_packet_received(Master_sc* handle, int64_t value);
 
 /*! Raises the in event 'tdma_slot' that is defined in the default interface scope. */ 
 extern void master_scIface_raise_tdma_slot(Master_sc* handle, uint8_t value);

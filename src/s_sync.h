@@ -1,9 +1,9 @@
 #ifndef S_SYNC_H_
 #define S_SYNC_H_
 
-#define	SYNC 0
-#define	FOLLOW_UP 1
-#define	DATA 2
+#define	SYNC (0)
+#define	FOLLOW_UP (1)
+#define	SLAVE (2)
 
 #include <stdint.h>
 

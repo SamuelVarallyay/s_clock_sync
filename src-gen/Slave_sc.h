@@ -3,10 +3,10 @@
 #define SLAVE_SC_H_
 
 #include "sc_types.h"
-#include "..\model\slave.h"
-#include <tdma_params.h>
 #include <s_sync.h>
 #include <controller.h>
+#include <tdma_params.h>
+#include "..\model\slave.h"
 #include <fixedptc.h>
 #include <s_clock.h>
 

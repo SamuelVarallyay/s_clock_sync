@@ -460,7 +460,7 @@ static void effect_main_region_cycle_followup_wait_for_2_followup_tr0(Slave_sc* 
 	handle->internal.sync_tx_ts = handle->iface.packet_received_value;
 	handle->internal.offset = handle->internal.sync_rx_ts - handle->internal.sync_tx_ts - handle->internal.delay;
 	handle->internal.drift = (((float) handle->internal.offset)) / CYCLE_LENGTH;
-	s_clockDriftCorrection(fixedpt_fromfloat(handle->internal.drift));
+	s_clockDriftCorrection(fixedpt_fromxfloat(handle->internal.drift));
 	handle->internal.PIctrl.I = handle->internal.drift;
 	s_clockAddInt(-handle->internal.offset);
 	enseq_main_region_cycle_followup_wait_default(handle);
@@ -472,7 +472,7 @@ static void effect_main_region_cycle_followup_wait_tr0(Slave_sc* handle)
 	handle->internal.sync_tx_ts = handle->iface.packet_received_value;
 	handle->internal.offset = handle->internal.sync_rx_ts - handle->internal.sync_tx_ts - handle->internal.delay;
 	handle->internal.drift = PIcontroller(&(handle->internal.PIctrl), (((float) handle->internal.offset)) / CYCLE_LENGTH);
-	s_clockDriftCorrection(fixedpt_fromfloat(handle->internal.drift));
+	s_clockDriftCorrection(fixedpt_fromxfloat(handle->internal.drift));
 	enseq_main_region_cycle_followup_wait_default(handle);
 }
 
@@ -524,7 +524,7 @@ static void enact_main_region_init(Slave_sc* handle)
 {
 	/* Entry action for state 'init'. */
 	setSourceAddress(tx_packet, handle->iface.slave_index + 1);
-	setPacketType(tx_packet, DATA);
+	setPacketType(tx_packet, SLAVE);
 	handle->internal.PIctrl.Ki = 1 / 4;
 	handle->internal.PIctrl.Kp = 1 / 16;
 }

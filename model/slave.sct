@@ -5,7 +5,7 @@
       <vertices xsi:type="sgraph:Entry" xmi:id="_B4hDoNVUEeiSs4DiSAeLPQ">
         <outgoingTransitions xmi:id="_B4kG8tVUEeiSs4DiSAeLPQ" target="_B4hqt9VUEeiSs4DiSAeLPQ"/>
       </vertices>
-      <vertices xsi:type="sgraph:State" xmi:id="_B4hqt9VUEeiSs4DiSAeLPQ" specification="entry /&#xD;&#xA;setSourceAddress(tx_packet,slave_index+1);&#xD;&#xA;setPacketType(tx_packet, DATA);&#xD;&#xA;PIctrl.Ki = 1/4;&#xD;&#xA;PIctrl.Kp = 1/16" name="init" incomingTransitions="_B4kG8tVUEeiSs4DiSAeLPQ">
+      <vertices xsi:type="sgraph:State" xmi:id="_B4hqt9VUEeiSs4DiSAeLPQ" specification="entry /&#xD;&#xA;setSourceAddress(tx_packet,slave_index+1);&#xD;&#xA;setPacketType(tx_packet, SLAVE);&#xD;&#xA;PIctrl.Ki = 1/4;&#xD;&#xA;PIctrl.Kp = 1/16" name="init" incomingTransitions="_B4kG8tVUEeiSs4DiSAeLPQ">
         <outgoingTransitions xmi:id="_8IB2QOtNEeiP3IAYXHZaiA" specification="always" target="_JgTUYOtNEeiP3IAYXHZaiA"/>
       </vertices>
       <vertices xsi:type="sgraph:State" xmi:id="_NDdLcNXrEeiSs4DiSAeLPQ" specification="" name="wait for followup" incomingTransitions="_GCVjQOtOEeiP3IAYXHZaiA">
@@ -47,13 +47,13 @@
         </regions>
         <regions xmi:id="_V216oOtKEei1W7n23X5LFw" name="followup">
           <vertices xsi:type="sgraph:State" xmi:id="_-prQcOtJEei1W7n23X5LFw" name="wait for 2.followup" incomingTransitions="__g5W4OtKEeiP3IAYXHZaiA">
-            <outgoingTransitions xmi:id="_IFkGoOtLEeiP3IAYXHZaiA" specification="packet_received[getPacketType(rx_packet) == FOLLOW_UP]/&#xD;&#xA;&#xD;&#xA;sync_tx_ts = valueof(packet_received);&#xD;&#xA;offset = sync_rx_ts - sync_tx_ts - delay;&#xD;&#xA;drift = (offset as float)/CYCLE_LENGTH;&#xD;&#xA;s_clockDriftCorrection(fixedpt_fromfloat(drift));&#xD;&#xA;PIctrl.I = drift;&#xD;&#xA;s_clockAddInt(-offset)" target="_IFaVoOtLEeiP3IAYXHZaiA"/>
+            <outgoingTransitions xmi:id="_IFkGoOtLEeiP3IAYXHZaiA" specification="packet_received[getPacketType(rx_packet) == FOLLOW_UP]/&#xD;&#xA;&#xD;&#xA;sync_tx_ts = valueof(packet_received);&#xD;&#xA;offset = sync_rx_ts - sync_tx_ts - delay;&#xD;&#xA;drift = (offset as float)/CYCLE_LENGTH;&#xD;&#xA;s_clockDriftCorrection(fixedpt_fromxfloat(drift));&#xD;&#xA;PIctrl.I = drift;&#xD;&#xA;s_clockAddInt(-offset)" target="_IFaVoOtLEeiP3IAYXHZaiA"/>
           </vertices>
           <vertices xsi:type="sgraph:Entry" xmi:id="_--SZEOtKEeiP3IAYXHZaiA">
             <outgoingTransitions xmi:id="__g5W4OtKEeiP3IAYXHZaiA" specification="" target="_-prQcOtJEei1W7n23X5LFw"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_IFaVoOtLEeiP3IAYXHZaiA" name="wait" incomingTransitions="_IFkGoOtLEeiP3IAYXHZaiA _9HrnUOtLEeiP3IAYXHZaiA">
-            <outgoingTransitions xmi:id="_9HrnUOtLEeiP3IAYXHZaiA" specification="packet_received[getPacketType(rx_packet) == FOLLOW_UP]/&#xD;&#xA;&#xD;&#xA;sync_tx_ts = valueof(packet_received);&#xD;&#xA;offset = sync_rx_ts - sync_tx_ts - delay;&#xD;&#xA;drift = PIcontroller(PIctrl.pointer,(offset as float)/CYCLE_LENGTH);&#xD;&#xA;s_clockDriftCorrection(fixedpt_fromfloat(drift))" target="_IFaVoOtLEeiP3IAYXHZaiA"/>
+            <outgoingTransitions xmi:id="_9HrnUOtLEeiP3IAYXHZaiA" specification="packet_received[getPacketType(rx_packet) == FOLLOW_UP]/&#xD;&#xA;&#xD;&#xA;sync_tx_ts = valueof(packet_received);&#xD;&#xA;offset = sync_rx_ts - sync_tx_ts - delay;&#xD;&#xA;drift = PIcontroller(PIctrl.pointer,(offset as float)/CYCLE_LENGTH);&#xD;&#xA;s_clockDriftCorrection(fixedpt_fromxfloat(drift))" target="_IFaVoOtLEeiP3IAYXHZaiA"/>
           </vertices>
         </regions>
       </vertices>
