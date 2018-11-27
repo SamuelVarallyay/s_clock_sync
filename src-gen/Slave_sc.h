@@ -3,12 +3,12 @@
 #define SLAVE_SC_H_
 
 #include "sc_types.h"
-#include <s_sync.h>
-#include <controller.h>
-#include <tdma_params.h>
-#include "..\model\slave.h"
-#include <fixedptc.h>
 #include <s_clock.h>
+#include <controller.h>
+#include "..\model\slave.h"
+#include <s_sync.h>
+#include <fixedptc.h>
+#include <tdma_params.h>
 
 #ifdef __cplusplus
 extern "C" { 
@@ -103,6 +103,8 @@ typedef struct
 	int64_t packet_received_value;
 	sc_boolean tdma_slot_raised;
 	uint8_t tdma_slot_value;
+	sc_boolean tdma_slot_prepare_raised;
+	uint8_t tdma_slot_prepare_value;
 	uint8_t * rx_packet;
 	uint8_t slave_index;
 } Slave_scIface;
@@ -165,6 +167,9 @@ extern void slave_scIface_raise_packet_received(Slave_sc* handle, int64_t value)
 
 /*! Raises the in event 'tdma_slot' that is defined in the default interface scope. */ 
 extern void slave_scIface_raise_tdma_slot(Slave_sc* handle, uint8_t value);
+
+/*! Raises the in event 'tdma_slot_prepare' that is defined in the default interface scope. */ 
+extern void slave_scIface_raise_tdma_slot_prepare(Slave_sc* handle, uint8_t value);
 
 /*! Gets the value of the variable 'rx_packet' that is defined in the default interface scope. */ 
 extern uint8_t * slave_scIface_get_rx_packet(const Slave_sc* handle);

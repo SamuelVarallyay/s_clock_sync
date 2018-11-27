@@ -18,6 +18,7 @@
 #include "Slave_sc.h"
 #include "s_sync.h"
 #include "tdma_params.h"
+#include "debug_wire.h"
 
 #include "retargetserial.h"
 
@@ -85,13 +86,20 @@ int main(void) {
 					slave_scIface_raise_tdma_slot(&slave_sc, slot_num);
 				}
 			}
+			if ((ms+6) % SLOT_LENGTH == 0){
+				slot_num = ((ms+6) / SLOT_LENGTH) % SLOT_NUMBER;
+				if (master) {
+					//master_scIface_raise_tdma_slot_prepare(&master_sc, slot_num);
+				}else{
+					slave_scIface_raise_tdma_slot_prepare(&slave_sc, slot_num);
+				}
+			}
 		}
 		/*NIRQ is active low*/
 		if(0 == ezradio_hal_NirqLevel()){
 			ezradio_cmd_reply_t interrupt_status;
 			ezradio_get_int_status_fast_clear_read(&interrupt_status);
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_PACKET_SENT_PEND_BIT){
-				printf("packet_sent\n");
 				if (master) {
 					master_scIface_raise_packet_sent(&master_sc,s_ts_to_int(s_clockGetTX_ts()));
 				}else{
@@ -100,6 +108,18 @@ int main(void) {
 			}
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_PACKET_RX_PEND_BIT){
 				ezradio_read_rx_fifo(64, rx_packet);
+				printf("pktRX:");
+				int i;
+				for(i = 0; i<64; i++){
+					/* convert bytes to ascii hex*/
+					char high = (rx_packet[i] >> 4) + '0';
+					char low = (rx_packet[i] & 0xF) + '0';
+					if(high > '9') high += 7;
+					if(low > '9') low += 7;
+					RETARGET_WriteChar(high);
+					RETARGET_WriteChar(low);
+				}
+				printf("\n");
 				if (master) {
 					master_scIface_raise_packet_received(&master_sc,s_ts_to_int(s_clockGetTX_ts()));
 				}else{
@@ -110,5 +130,6 @@ int main(void) {
 
 			}
 		}
+
 	}
 }

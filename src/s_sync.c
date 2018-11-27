@@ -6,6 +6,8 @@
 #include "s_clock.h"
 #include "s_radio.h"
 #include "s_sync.h"
+#include "retargetserial.h"
+#include <stdio.h>
 
 void setup_prs(){
     /* Setup PRS */
@@ -37,6 +39,18 @@ void sendPacket(uint8_t* packet)
 {
 	ezradio_write_tx_fifo(64, packet);
 	ezradio_start_tx(0, 0x30, 0u);
+	printf("pktTX:");
+	int i;
+	for(i = 0; i<64;i++){
+		/* convert bytes to ascii hex*/
+		char high = (packet[i] >> 4) + '0';
+		char low = (packet[i] & 0xF) + '0';
+		if(high > '9') high += 7;
+		if(low > '9') low += 7;
+		RETARGET_WriteChar(high);
+		RETARGET_WriteChar(low);
+	}
+	printf("\n");
 	//ezradio_start_tx_fast();
 }
 

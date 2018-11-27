@@ -3,8 +3,8 @@
 #define MASTER_SC_H_
 
 #include "sc_types.h"
-#include <s_sync.h>
 #include "..\model\master.h"
+#include <s_sync.h>
 
 #ifdef __cplusplus
 extern "C" { 
@@ -32,7 +32,7 @@ extern "C" {
 #define SCVI_MASTER_SC_MAIN_REGION_SYNC_FOLLOW_UP_SLOT_FOLLOW_UP 2
 #define SCVI_MASTER_SC_MAIN_REGION_SYNC_FOLLOW_UP_SLOT_WAIT 2
 #define SCVI_MASTER_SC_MAIN_REGION_SYNC_SLAVE_WAIT_SLAVE 3
-#define SCVI_MASTER_SC_MAIN_REGION_SYNC_SLAVE_WAIT 3
+#define SCVI_MASTER_SC_MAIN_REGION_SYNC_SLAVE_START_LAVE_SLOT 3
 
 
 /*
@@ -73,7 +73,7 @@ typedef enum
 	Master_sc_main_region_sync_Follow_up_slot_Follow_Up,
 	Master_sc_main_region_sync_Follow_up_slot_wait,
 	Master_sc_main_region_sync_slave_wait_slave,
-	Master_sc_main_region_sync_slave_wait
+	Master_sc_main_region_sync_slave_start_lave_slot
 } Master_scStates;
 
 

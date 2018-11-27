@@ -15,9 +15,9 @@ static sc_boolean check_main_region_sync_Sync_slot_wait_tr0_tr0(const Master_sc*
 static sc_boolean check_main_region_sync_Follow_up_slot_Follow_Up_tr0_tr0(const Master_sc* handle);
 static sc_boolean check_main_region_sync_Follow_up_slot_wait_tr0_tr0(const Master_sc* handle);
 static sc_boolean check_main_region_sync_slave_wait_slave_tr0_tr0(const Master_sc* handle);
-static sc_boolean check_main_region_sync_slave_wait_tr0_tr0(const Master_sc* handle);
-static sc_boolean check_main_region_sync_slave_wait_tr1_tr1(const Master_sc* handle);
-static sc_boolean check_main_region_sync_slave_wait_tr2_tr2(const Master_sc* handle);
+static sc_boolean check_main_region_sync_slave_start_lave_slot_tr0_tr0(const Master_sc* handle);
+static sc_boolean check_main_region_sync_slave_start_lave_slot_tr1_tr1(const Master_sc* handle);
+static sc_boolean check_main_region_sync_slave_start_lave_slot_tr2_tr2(const Master_sc* handle);
 static sc_boolean check_main_region_sync_tdma__choice_0_tr1_tr1(const Master_sc* handle);
 static sc_boolean check_main_region_sync_tdma__choice_0_tr2_tr2(const Master_sc* handle);
 static sc_boolean check_main_region_sync_tdma__choice_0_tr0_tr0(const Master_sc* handle);
@@ -28,14 +28,14 @@ static void effect_main_region_sync_Sync_slot_wait_tr0(Master_sc* handle);
 static void effect_main_region_sync_Follow_up_slot_Follow_Up_tr0(Master_sc* handle);
 static void effect_main_region_sync_Follow_up_slot_wait_tr0(Master_sc* handle);
 static void effect_main_region_sync_slave_wait_slave_tr0(Master_sc* handle);
-static void effect_main_region_sync_slave_wait_tr0(Master_sc* handle);
-static void effect_main_region_sync_slave_wait_tr1(Master_sc* handle);
-static void effect_main_region_sync_slave_wait_tr2(Master_sc* handle);
+static void effect_main_region_sync_slave_start_lave_slot_tr0(Master_sc* handle);
+static void effect_main_region_sync_slave_start_lave_slot_tr1(Master_sc* handle);
+static void effect_main_region_sync_slave_start_lave_slot_tr2(Master_sc* handle);
 static void effect_main_region_sync_tdma__choice_0_tr1(Master_sc* handle);
 static void effect_main_region_sync_tdma__choice_0_tr2(Master_sc* handle);
 static void effect_main_region_sync_tdma__choice_0_tr0(Master_sc* handle);
 static void enact_main_region_init(Master_sc* handle);
-static void enact_main_region_sync_slave_wait(Master_sc* handle);
+static void enact_main_region_sync_slave_start_lave_slot(Master_sc* handle);
 static void enseq_main_region_init_default(Master_sc* handle);
 static void enseq_main_region_sync_default(Master_sc* handle);
 static void enseq_main_region_sync_tdma_active_default(Master_sc* handle);
@@ -44,7 +44,7 @@ static void enseq_main_region_sync_Sync_slot_wait_default(Master_sc* handle);
 static void enseq_main_region_sync_Follow_up_slot_Follow_Up_default(Master_sc* handle);
 static void enseq_main_region_sync_Follow_up_slot_wait_default(Master_sc* handle);
 static void enseq_main_region_sync_slave_wait_slave_default(Master_sc* handle);
-static void enseq_main_region_sync_slave_wait_default(Master_sc* handle);
+static void enseq_main_region_sync_slave_start_lave_slot_default(Master_sc* handle);
 static void enseq_main_region_default(Master_sc* handle);
 static void enseq_main_region_sync_tdma_default(Master_sc* handle);
 static void enseq_main_region_sync_Sync_slot_default(Master_sc* handle);
@@ -57,7 +57,7 @@ static void exseq_main_region_sync_Sync_slot_wait(Master_sc* handle);
 static void exseq_main_region_sync_Follow_up_slot_Follow_Up(Master_sc* handle);
 static void exseq_main_region_sync_Follow_up_slot_wait(Master_sc* handle);
 static void exseq_main_region_sync_slave_wait_slave(Master_sc* handle);
-static void exseq_main_region_sync_slave_wait(Master_sc* handle);
+static void exseq_main_region_sync_slave_start_lave_slot(Master_sc* handle);
 static void exseq_main_region(Master_sc* handle);
 static void exseq_main_region_sync_tdma(Master_sc* handle);
 static void exseq_main_region_sync_Sync_slot(Master_sc* handle);
@@ -70,7 +70,7 @@ static void react_main_region_sync_Sync_slot_wait(Master_sc* handle);
 static void react_main_region_sync_Follow_up_slot_Follow_Up(Master_sc* handle);
 static void react_main_region_sync_Follow_up_slot_wait(Master_sc* handle);
 static void react_main_region_sync_slave_wait_slave(Master_sc* handle);
-static void react_main_region_sync_slave_wait(Master_sc* handle);
+static void react_main_region_sync_slave_start_lave_slot(Master_sc* handle);
 static void react_main_region_sync_tdma__choice_0(Master_sc* handle);
 static void react_main_region__entry_Default(Master_sc* handle);
 static void react_main_region_sync_tdma__entry_Default(Master_sc* handle);
@@ -167,9 +167,9 @@ void master_sc_runCycle(Master_sc* handle)
 				react_main_region_sync_slave_wait_slave(handle);
 				break;
 			}
-			case Master_sc_main_region_sync_slave_wait:
+			case Master_sc_main_region_sync_slave_start_lave_slot:
 			{
-				react_main_region_sync_slave_wait(handle);
+				react_main_region_sync_slave_start_lave_slot(handle);
 				break;
 			}
 			default:
@@ -220,7 +220,7 @@ sc_boolean master_sc_isStateActive(const Master_sc* handle, Master_scStates stat
 			break;
 		case Master_sc_main_region_sync :
 			result = (sc_boolean) (handle->stateConfVector[SCVI_MASTER_SC_MAIN_REGION_SYNC] >= Master_sc_main_region_sync
-				&& handle->stateConfVector[SCVI_MASTER_SC_MAIN_REGION_SYNC] <= Master_sc_main_region_sync_slave_wait);
+				&& handle->stateConfVector[SCVI_MASTER_SC_MAIN_REGION_SYNC] <= Master_sc_main_region_sync_slave_start_lave_slot);
 			break;
 		case Master_sc_main_region_sync_tdma_active :
 			result = (sc_boolean) (handle->stateConfVector[SCVI_MASTER_SC_MAIN_REGION_SYNC_TDMA_ACTIVE] == Master_sc_main_region_sync_tdma_active
@@ -246,8 +246,8 @@ sc_boolean master_sc_isStateActive(const Master_sc* handle, Master_scStates stat
 			result = (sc_boolean) (handle->stateConfVector[SCVI_MASTER_SC_MAIN_REGION_SYNC_SLAVE_WAIT_SLAVE] == Master_sc_main_region_sync_slave_wait_slave
 			);
 			break;
-		case Master_sc_main_region_sync_slave_wait :
-			result = (sc_boolean) (handle->stateConfVector[SCVI_MASTER_SC_MAIN_REGION_SYNC_SLAVE_WAIT] == Master_sc_main_region_sync_slave_wait
+		case Master_sc_main_region_sync_slave_start_lave_slot :
+			result = (sc_boolean) (handle->stateConfVector[SCVI_MASTER_SC_MAIN_REGION_SYNC_SLAVE_START_LAVE_SLOT] == Master_sc_main_region_sync_slave_start_lave_slot
 			);
 			break;
 		default:
@@ -340,17 +340,17 @@ static sc_boolean check_main_region_sync_slave_wait_slave_tr0_tr0(const Master_s
 	return handle->internal.slave_slot_raised;
 }
 
-static sc_boolean check_main_region_sync_slave_wait_tr0_tr0(const Master_sc* handle)
+static sc_boolean check_main_region_sync_slave_start_lave_slot_tr0_tr0(const Master_sc* handle)
 {
 	return handle->iface.packet_received_raised;
 }
 
-static sc_boolean check_main_region_sync_slave_wait_tr1_tr1(const Master_sc* handle)
+static sc_boolean check_main_region_sync_slave_start_lave_slot_tr1_tr1(const Master_sc* handle)
 {
 	return handle->internal.slave_slot_raised;
 }
 
-static sc_boolean check_main_region_sync_slave_wait_tr2_tr2(const Master_sc* handle)
+static sc_boolean check_main_region_sync_slave_start_lave_slot_tr2_tr2(const Master_sc* handle)
 {
 	return handle->internal.followup_slot_raised;
 }
@@ -413,26 +413,26 @@ static void effect_main_region_sync_Follow_up_slot_wait_tr0(Master_sc* handle)
 static void effect_main_region_sync_slave_wait_slave_tr0(Master_sc* handle)
 {
 	exseq_main_region_sync_slave_wait_slave(handle);
-	enseq_main_region_sync_slave_wait_default(handle);
+	enseq_main_region_sync_slave_start_lave_slot_default(handle);
 }
 
-static void effect_main_region_sync_slave_wait_tr0(Master_sc* handle)
+static void effect_main_region_sync_slave_start_lave_slot_tr0(Master_sc* handle)
 {
-	exseq_main_region_sync_slave_wait(handle);
+	exseq_main_region_sync_slave_start_lave_slot(handle);
 	relative_slave_ts[handle->internal.slave_index] = ((int32_t) (handle->iface.packet_received_value - handle->internal.sync_tx_ts));
 	setDelayResp(sync_packet, relative_slave_ts[handle->internal.slave_index], handle->internal.slave_index);
 	enseq_main_region_sync_slave_wait_slave_default(handle);
 }
 
-static void effect_main_region_sync_slave_wait_tr1(Master_sc* handle)
+static void effect_main_region_sync_slave_start_lave_slot_tr1(Master_sc* handle)
 {
-	exseq_main_region_sync_slave_wait(handle);
-	enseq_main_region_sync_slave_wait_default(handle);
+	exseq_main_region_sync_slave_start_lave_slot(handle);
+	enseq_main_region_sync_slave_start_lave_slot_default(handle);
 }
 
-static void effect_main_region_sync_slave_wait_tr2(Master_sc* handle)
+static void effect_main_region_sync_slave_start_lave_slot_tr2(Master_sc* handle)
 {
-	exseq_main_region_sync_slave_wait(handle);
+	exseq_main_region_sync_slave_start_lave_slot(handle);
 	enseq_main_region_sync_slave_wait_slave_default(handle);
 }
 
@@ -466,10 +466,10 @@ static void enact_main_region_init(Master_sc* handle)
 	handle->internal.slave_index = 0;
 }
 
-/* Entry action for state 'wait'. */
-static void enact_main_region_sync_slave_wait(Master_sc* handle)
+/* Entry action for state 'start lave slot'. */
+static void enact_main_region_sync_slave_start_lave_slot(Master_sc* handle)
 {
-	/* Entry action for state 'wait'. */
+	/* Entry action for state 'start lave slot'. */
 	startRx();
 	relative_slave_ts[handle->internal.slave_index] = 0;
 	setDelayResp(sync_packet, 0, handle->internal.slave_index);
@@ -542,12 +542,12 @@ static void enseq_main_region_sync_slave_wait_slave_default(Master_sc* handle)
 	handle->stateConfVectorPosition = 3;
 }
 
-/* 'default' enter sequence for state wait */
-static void enseq_main_region_sync_slave_wait_default(Master_sc* handle)
+/* 'default' enter sequence for state start lave slot */
+static void enseq_main_region_sync_slave_start_lave_slot_default(Master_sc* handle)
 {
-	/* 'default' enter sequence for state wait */
-	enact_main_region_sync_slave_wait(handle);
-	handle->stateConfVector[3] = Master_sc_main_region_sync_slave_wait;
+	/* 'default' enter sequence for state start lave slot */
+	enact_main_region_sync_slave_start_lave_slot(handle);
+	handle->stateConfVector[3] = Master_sc_main_region_sync_slave_start_lave_slot;
 	handle->stateConfVectorPosition = 3;
 }
 
@@ -642,10 +642,10 @@ static void exseq_main_region_sync_slave_wait_slave(Master_sc* handle)
 	handle->stateConfVectorPosition = 3;
 }
 
-/* Default exit sequence for state wait */
-static void exseq_main_region_sync_slave_wait(Master_sc* handle)
+/* Default exit sequence for state start lave slot */
+static void exseq_main_region_sync_slave_start_lave_slot(Master_sc* handle)
 {
-	/* Default exit sequence for state wait */
+	/* Default exit sequence for state start lave slot */
 	handle->stateConfVector[3] = Master_sc_last_state;
 	handle->stateConfVectorPosition = 3;
 }
@@ -707,9 +707,9 @@ static void exseq_main_region(Master_sc* handle)
 			exseq_main_region_sync_slave_wait_slave(handle);
 			break;
 		}
-		case Master_sc_main_region_sync_slave_wait :
+		case Master_sc_main_region_sync_slave_start_lave_slot :
 		{
-			exseq_main_region_sync_slave_wait(handle);
+			exseq_main_region_sync_slave_start_lave_slot(handle);
 			break;
 		}
 		default: break;
@@ -786,9 +786,9 @@ static void exseq_main_region_sync_slave(Master_sc* handle)
 			exseq_main_region_sync_slave_wait_slave(handle);
 			break;
 		}
-		case Master_sc_main_region_sync_slave_wait :
+		case Master_sc_main_region_sync_slave_start_lave_slot :
 		{
-			exseq_main_region_sync_slave_wait(handle);
+			exseq_main_region_sync_slave_start_lave_slot(handle);
 			break;
 		}
 		default: break;
@@ -862,23 +862,23 @@ static void react_main_region_sync_slave_wait_slave(Master_sc* handle)
 	} 
 }
 
-/* The reactions of state wait. */
-static void react_main_region_sync_slave_wait(Master_sc* handle)
+/* The reactions of state start lave slot. */
+static void react_main_region_sync_slave_start_lave_slot(Master_sc* handle)
 {
-	/* The reactions of state wait. */
-	if (check_main_region_sync_slave_wait_tr0_tr0(handle) == bool_true)
+	/* The reactions of state start lave slot. */
+	if (check_main_region_sync_slave_start_lave_slot_tr0_tr0(handle) == bool_true)
 	{ 
-		effect_main_region_sync_slave_wait_tr0(handle);
+		effect_main_region_sync_slave_start_lave_slot_tr0(handle);
 	}  else
 	{
-		if (check_main_region_sync_slave_wait_tr1_tr1(handle) == bool_true)
+		if (check_main_region_sync_slave_start_lave_slot_tr1_tr1(handle) == bool_true)
 		{ 
-			effect_main_region_sync_slave_wait_tr1(handle);
+			effect_main_region_sync_slave_start_lave_slot_tr1(handle);
 		}  else
 		{
-			if (check_main_region_sync_slave_wait_tr2_tr2(handle) == bool_true)
+			if (check_main_region_sync_slave_start_lave_slot_tr2_tr2(handle) == bool_true)
 			{ 
-				effect_main_region_sync_slave_wait_tr2(handle);
+				effect_main_region_sync_slave_start_lave_slot_tr2(handle);
 			} 
 		}
 	}

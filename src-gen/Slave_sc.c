@@ -11,6 +11,7 @@
 static sc_boolean check_main_region_init_tr0_tr0(const Slave_sc* handle);
 static sc_boolean check_main_region_wait_for_followup_tr0_tr0(const Slave_sc* handle);
 static sc_boolean check_main_region_cycle_tbma_active_tr0_tr0(const Slave_sc* handle);
+static sc_boolean check_main_region_cycle_tbma_active_tr1_tr1(const Slave_sc* handle);
 static sc_boolean check_main_region_cycle_response_response_tr0_tr0(const Slave_sc* handle);
 static sc_boolean check_main_region_cycle_response_timediff_tr0_tr0(const Slave_sc* handle);
 static sc_boolean check_main_region_cycle_sync_wait_for_sync_tr0_tr0(const Slave_sc* handle);
@@ -21,11 +22,15 @@ static sc_boolean check_main_region_cycle_tbma__choice_0_tr0_tr0(const Slave_sc*
 static sc_boolean check_main_region_cycle_tbma__choice_0_tr1_tr1(const Slave_sc* handle);
 static sc_boolean check_main_region_cycle_tbma__choice_0_tr2_tr2(const Slave_sc* handle);
 static sc_boolean check_main_region_cycle_tbma__choice_0_tr3_tr3(const Slave_sc* handle);
+static sc_boolean check_main_region_cycle_tbma__choice_1_tr0_tr0(const Slave_sc* handle);
+static sc_boolean check_main_region_cycle_tbma__choice_1_tr1_tr1(const Slave_sc* handle);
+static sc_boolean check_main_region_cycle_tbma__choice_1_tr2_tr2(const Slave_sc* handle);
 static sc_boolean check_main_region__choice_0_tr0_tr0(const Slave_sc* handle);
 static sc_boolean check_main_region__choice_0_tr1_tr1(const Slave_sc* handle);
 static void effect_main_region_init_tr0(Slave_sc* handle);
 static void effect_main_region_wait_for_followup_tr0(Slave_sc* handle);
 static void effect_main_region_cycle_tbma_active_tr0(Slave_sc* handle);
+static void effect_main_region_cycle_tbma_active_tr1(Slave_sc* handle);
 static void effect_main_region_cycle_response_response_tr0(Slave_sc* handle);
 static void effect_main_region_cycle_response_timediff_tr0(Slave_sc* handle);
 static void effect_main_region_cycle_sync_wait_for_sync_tr0(Slave_sc* handle);
@@ -36,6 +41,9 @@ static void effect_main_region_cycle_tbma__choice_0_tr0(Slave_sc* handle);
 static void effect_main_region_cycle_tbma__choice_0_tr1(Slave_sc* handle);
 static void effect_main_region_cycle_tbma__choice_0_tr2(Slave_sc* handle);
 static void effect_main_region_cycle_tbma__choice_0_tr3(Slave_sc* handle);
+static void effect_main_region_cycle_tbma__choice_1_tr0(Slave_sc* handle);
+static void effect_main_region_cycle_tbma__choice_1_tr1(Slave_sc* handle);
+static void effect_main_region_cycle_tbma__choice_1_tr2(Slave_sc* handle);
 static void effect_main_region__choice_0_tr0(Slave_sc* handle);
 static void effect_main_region__choice_0_tr1(Slave_sc* handle);
 static void enact_main_region_init(Slave_sc* handle);
@@ -80,6 +88,7 @@ static void react_main_region_cycle_followup_wait_for_2_followup(Slave_sc* handl
 static void react_main_region_cycle_followup_wait(Slave_sc* handle);
 static void react_main_region_wait_for_sync(Slave_sc* handle);
 static void react_main_region_cycle_tbma__choice_0(Slave_sc* handle);
+static void react_main_region_cycle_tbma__choice_1(Slave_sc* handle);
 static void react_main_region__choice_0(Slave_sc* handle);
 static void react_main_region__entry_Default(Slave_sc* handle);
 static void react_main_region_cycle_tbma__entry_Default(Slave_sc* handle);
@@ -286,6 +295,7 @@ static void clearInEvents(Slave_sc* handle)
 	handle->iface.packet_sent_raised = bool_false;
 	handle->iface.packet_received_raised = bool_false;
 	handle->iface.tdma_slot_raised = bool_false;
+	handle->iface.tdma_slot_prepare_raised = bool_false;
 	handle->internal.slave_slot_raised = bool_false;
 	handle->internal.sync_slot_raised = bool_false;
 	handle->internal.followup_slot_raised = bool_false;
@@ -313,6 +323,13 @@ void slave_scIface_raise_tdma_slot(Slave_sc* handle, uint8_t value)
 {
 	handle->iface.tdma_slot_value = value;
 	handle->iface.tdma_slot_raised = bool_true;
+	
+	slave_sc_runCycle(handle);
+}
+void slave_scIface_raise_tdma_slot_prepare(Slave_sc* handle, uint8_t value)
+{
+	handle->iface.tdma_slot_prepare_value = value;
+	handle->iface.tdma_slot_prepare_raised = bool_true;
 	
 	slave_sc_runCycle(handle);
 }
@@ -350,6 +367,11 @@ static sc_boolean check_main_region_wait_for_followup_tr0_tr0(const Slave_sc* ha
 static sc_boolean check_main_region_cycle_tbma_active_tr0_tr0(const Slave_sc* handle)
 {
 	return handle->iface.tdma_slot_raised;
+}
+
+static sc_boolean check_main_region_cycle_tbma_active_tr1_tr1(const Slave_sc* handle)
+{
+	return handle->iface.tdma_slot_prepare_raised;
 }
 
 static sc_boolean check_main_region_cycle_response_response_tr0_tr0(const Slave_sc* handle)
@@ -402,6 +424,21 @@ static sc_boolean check_main_region_cycle_tbma__choice_0_tr3_tr3(const Slave_sc*
 	return bool_true;
 }
 
+static sc_boolean check_main_region_cycle_tbma__choice_1_tr0_tr0(const Slave_sc* handle)
+{
+	return (handle->iface.tdma_slot_prepare_value == 0) ? bool_true : bool_false;
+}
+
+static sc_boolean check_main_region_cycle_tbma__choice_1_tr1_tr1(const Slave_sc* handle)
+{
+	return (handle->iface.tdma_slot_prepare_value == 1) ? bool_true : bool_false;
+}
+
+static sc_boolean check_main_region_cycle_tbma__choice_1_tr2_tr2(const Slave_sc* handle)
+{
+	return bool_true;
+}
+
 static sc_boolean check_main_region__choice_0_tr0_tr0(const Slave_sc* handle)
 {
 	return (getPacketType(handle->iface.rx_packet) == SYNC) ? bool_true : bool_false;
@@ -432,10 +469,17 @@ static void effect_main_region_cycle_tbma_active_tr0(Slave_sc* handle)
 	react_main_region_cycle_tbma__choice_0(handle);
 }
 
+static void effect_main_region_cycle_tbma_active_tr1(Slave_sc* handle)
+{
+	exseq_main_region_cycle_tbma_active(handle);
+	react_main_region_cycle_tbma__choice_1(handle);
+}
+
 static void effect_main_region_cycle_response_response_tr0(Slave_sc* handle)
 {
 	exseq_main_region_cycle_response_response(handle);
 	handle->internal.slave_time_diff = ((int32_t) (handle->iface.packet_sent_value - handle->internal.sync_rx_ts));
+	startRx();
 	enseq_main_region_cycle_response_timediff_default(handle);
 }
 
@@ -451,6 +495,7 @@ static void effect_main_region_cycle_sync_wait_for_sync_tr0(Slave_sc* handle)
 	handle->internal.sync_rx_ts = handle->iface.packet_received_value;
 	handle->internal.master_time_diff = ((int32_t) getDelayResp(handle->iface.rx_packet, handle->iface.slave_index));
 	handle->internal.delay = (handle->internal.master_time_diff - handle->internal.slave_time_diff) / 2;
+	startRx();
 	enseq_main_region_cycle_sync_wait_for_sync_default(handle);
 }
 
@@ -459,7 +504,7 @@ static void effect_main_region_cycle_followup_wait_for_2_followup_tr0(Slave_sc* 
 	exseq_main_region_cycle_followup_wait_for_2_followup(handle);
 	handle->internal.sync_tx_ts = handle->iface.packet_received_value;
 	handle->internal.offset = handle->internal.sync_rx_ts - handle->internal.sync_tx_ts - handle->internal.delay;
-	handle->internal.drift = (((float) handle->internal.offset)) / CYCLE_LENGTH;
+	handle->internal.drift = (((float) handle->internal.offset)) / FRAME_LENGTH;
 	s_clockDriftCorrection(fixedpt_fromxfloat(handle->internal.drift));
 	handle->internal.PIctrl.I = handle->internal.drift;
 	s_clockAddInt(-handle->internal.offset);
@@ -471,7 +516,7 @@ static void effect_main_region_cycle_followup_wait_tr0(Slave_sc* handle)
 	exseq_main_region_cycle_followup_wait(handle);
 	handle->internal.sync_tx_ts = handle->iface.packet_received_value;
 	handle->internal.offset = handle->internal.sync_rx_ts - handle->internal.sync_tx_ts - handle->internal.delay;
-	handle->internal.drift = PIcontroller(&(handle->internal.PIctrl), (((float) handle->internal.offset)) / CYCLE_LENGTH);
+	handle->internal.drift = PIcontroller(&(handle->internal.PIctrl), (((float) handle->internal.offset)) / FRAME_LENGTH);
 	s_clockDriftCorrection(fixedpt_fromxfloat(handle->internal.drift));
 	enseq_main_region_cycle_followup_wait_default(handle);
 }
@@ -490,19 +535,34 @@ static void effect_main_region_cycle_tbma__choice_0_tr0(Slave_sc* handle)
 
 static void effect_main_region_cycle_tbma__choice_0_tr1(Slave_sc* handle)
 {
+	enseq_main_region_cycle_tbma_active_default(handle);
+}
+
+static void effect_main_region_cycle_tbma__choice_0_tr2(Slave_sc* handle)
+{
+	enseq_main_region_cycle_tbma_active_default(handle);
+}
+
+static void effect_main_region_cycle_tbma__choice_0_tr3(Slave_sc* handle)
+{
+	enseq_main_region_cycle_tbma_active_default(handle);
+}
+
+static void effect_main_region_cycle_tbma__choice_1_tr0(Slave_sc* handle)
+{
 	startRx();
 	slave_sc_add_event_to_queue(handle, slave_scInternal_sync_slot);
 	enseq_main_region_cycle_tbma_active_default(handle);
 }
 
-static void effect_main_region_cycle_tbma__choice_0_tr2(Slave_sc* handle)
+static void effect_main_region_cycle_tbma__choice_1_tr1(Slave_sc* handle)
 {
 	startRx();
 	slave_sc_add_event_to_queue(handle, slave_scInternal_followup_slot);
 	enseq_main_region_cycle_tbma_active_default(handle);
 }
 
-static void effect_main_region_cycle_tbma__choice_0_tr3(Slave_sc* handle)
+static void effect_main_region_cycle_tbma__choice_1_tr2(Slave_sc* handle)
 {
 	enseq_main_region_cycle_tbma_active_default(handle);
 }
@@ -904,7 +964,13 @@ static void react_main_region_cycle_tbma_active(Slave_sc* handle)
 	if (check_main_region_cycle_tbma_active_tr0_tr0(handle) == bool_true)
 	{ 
 		effect_main_region_cycle_tbma_active_tr0(handle);
-	} 
+	}  else
+	{
+		if (check_main_region_cycle_tbma_active_tr1_tr1(handle) == bool_true)
+		{ 
+			effect_main_region_cycle_tbma_active_tr1(handle);
+		} 
+	}
 }
 
 /* The reactions of state response. */
@@ -988,6 +1054,25 @@ static void react_main_region_cycle_tbma__choice_0(Slave_sc* handle)
 			{
 				effect_main_region_cycle_tbma__choice_0_tr3(handle);
 			}
+		}
+	}
+}
+
+/* The reactions of state null. */
+static void react_main_region_cycle_tbma__choice_1(Slave_sc* handle)
+{
+	/* The reactions of state null. */
+	if (check_main_region_cycle_tbma__choice_1_tr0_tr0(handle) == bool_true)
+	{ 
+		effect_main_region_cycle_tbma__choice_1_tr0(handle);
+	}  else
+	{
+		if (check_main_region_cycle_tbma__choice_1_tr1_tr1(handle) == bool_true)
+		{ 
+			effect_main_region_cycle_tbma__choice_1_tr1(handle);
+		}  else
+		{
+			effect_main_region_cycle_tbma__choice_1_tr2(handle);
 		}
 	}
 }
