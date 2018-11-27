@@ -4,10 +4,10 @@
 #include "em_core.h"
 
 
-static volatile uint64_t millisecs = 0;
+static volatile int64_t millisecs = 0;
 static volatile s_timeStamp rx_time_stamp;
 static volatile s_timeStamp tx_time_stamp;
-static volatile uint32_t div = CLOCK_FREQUENCY_KHZ;
+static volatile int32_t div = CLOCK_FREQUENCY_KHZ;
 
 static volatile fixedpt drift_per_milliseconds = 0;
 static volatile fixedpt estimated_offset = 0;
@@ -75,7 +75,7 @@ void S_CLOCK_TIMER_IRQHandler(void) {
 		int32_t estimated_offset_floor = fixedpt_toint(estimated_offset);
 		div = CLOCK_FREQUENCY_KHZ - estimated_offset_floor;
 		estimated_offset = fixedpt_fracpart(estimated_offset);
-		uint32_t top = div - 1;
+		int32_t top = div - 1;
 		TIMER_TopSet(S_CLOCK_TIMER, top);
 		if (capture_rx
 				&& rx_time_stamp.ms_numerator < CLOCK_FREQUENCY_KHZ / 2) {
@@ -111,7 +111,7 @@ void s_clockDriftReset() {
 
 }
 
-void s_clockSetMillisecs(uint64_t ms) {
+void s_clockSetMillisecs(int64_t ms) {
 	CORE_irqState_t irqState;
 	irqState = CORE_EnterAtomic();
 	millisecs = ms;
@@ -148,11 +148,11 @@ s_timeStamp s_clockGetTX_ts() {
 
 
 
-uint64_t s_clockGetMillisecs() {
-uint64_t ms;
-CORE_irqState_t irqState;
-irqState = CORE_EnterAtomic();
-ms = millisecs;
-CORE_ExitAtomic(irqState);
-return ms;
+int64_t s_clockGetMillisecs() {
+	int64_t ms;
+	CORE_irqState_t irqState;
+	irqState = CORE_EnterAtomic();
+	ms = millisecs;
+	CORE_ExitAtomic(irqState);
+	return ms;
 }

@@ -7,9 +7,9 @@
 
 
 typedef struct{
-	uint64_t ms_whole;
-	uint16_t ms_numerator;
-	uint16_t ms_denominator;
+	int64_t ms_whole;
+	int32_t ms_numerator;
+	int32_t ms_denominator;
 }s_timeStamp;
 
 void s_clockInit();
@@ -17,10 +17,10 @@ void s_clockDriftCorrection(fixedpt drift_per_ms);
 void s_clockDriftReset();
 bool s_clockIntReadClear();
 
-void s_clockSetMillisecs(uint64_t ms);
+void s_clockSetMillisecs(int64_t ms);
 void s_clockAddMillisecs(int64_t ms);
 void s_clockAddInt(int64_t tick);
-uint64_t s_clockGetMillisecs();
+int64_t s_clockGetMillisecs();
 s_timeStamp s_clockGetTX_ts();
 s_timeStamp s_clockGetRX_ts();
 
