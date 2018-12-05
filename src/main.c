@@ -16,7 +16,7 @@
 #include "s_radio.h"
 #include "Master_sc.h"
 #include "Slave_sc.h"
-#include "s_sync.h"
+
 #include "tdma_params.h"
 #include "debug_wire.h"
 
@@ -44,9 +44,13 @@ int main(void) {
 
 	/* Initialize LEUART/USART and map LF to CRLF */
 	RETARGET_SerialInit();
-	RETARGET_SerialCrLf(1);
+	RETARGET_SerialCrLf(0);
 
-	bool master = DEVINFO->UNIQUEL == 0x790ab;
+	uint32_t uniqueID = DEVINFO->UNIQUEL;
+	bool master = uniqueID == 0x790ab;
+
+	//0x79105, 0x79384, 0x78fb0
+
 
 	Master_sc master_sc;
 	Slave_sc slave_sc;
@@ -55,20 +59,36 @@ int main(void) {
 	setup_prs();
 	s_radioInit();
 	s_clockInit();
+	debugWireInit();
 
 	/* Print header */
-	printf("Clock Sync init\n");
-	printf("UIDL: 0x%08x\n", (unsigned) DEVINFO->UNIQUEL);
+	printf("Clock Sync init\r\n");
+	printf("UIDL: 0x%08x\r\n", (unsigned) uniqueID);
 	if (master) {
-		printf("Master\n");
+		printf("Master\r\n");
 		master_sc_init(&master_sc);
 		master_scIface_set_rx_packet(&master_sc,rx_packet);
 		master_sc_enter(&master_sc);
 	} else {
-		printf("Slave\n");
+		printf("Slave\r\n");
+		uint8_t slot_id;
+		switch(uniqueID){
+		case 0x79105:
+			slot_id = 2;
+			break;
+		case 0x78fb0:
+			slot_id = 3;
+			break;
+		case 0x79384:
+			slot_id = 15;
+			break;
+		default:
+			break;
+		}
 		slave_sc_init(&slave_sc);
 		slave_scIface_set_rx_packet(&slave_sc,rx_packet);
-		slave_scIface_set_slave_index(&slave_sc,0);
+		slave_scIface_set_own_id(&slave_sc,slot_id);
+		slave_scIface_set_own_slot(&slave_sc,slot_id);
 		slave_sc_enter(&slave_sc);
 	}
 
@@ -77,23 +97,43 @@ int main(void) {
 
 	while(1){
 		if(s_clockIntReadClear()){
-			uint64_t ms = s_clockGetMillisecs();
+
+			int64_t ms = s_clockGetMillisecs();
 			if (ms % SLOT_LENGTH == 0){
+				debugWireSet();
 				slot_num = (ms / SLOT_LENGTH) % SLOT_NUMBER;
-				if (master) {
-					master_scIface_raise_tdma_slot(&master_sc, slot_num);
+				if (master){
+					switch (slot_num){
+					case 0:
+						debugWireClear();
+						debugWireSet();
+						master_scIface_raise_sync_slot(&master_sc);
+						break;
+					case 1:
+						master_scIface_raise_followup_slot(&master_sc);
+						break;
+					default:
+						master_scIface_raise_slave_slot(&master_sc,slot_num);
+						break;
+					}
 				}else{
-					slave_scIface_raise_tdma_slot(&slave_sc, slot_num);
+					switch (slot_num) {
+					case 0:
+						debugWireClear();
+						debugWireSet();
+						slave_scIface_raise_sync_slot(&slave_sc);
+						break;
+					case 1:
+						slave_scIface_raise_followup_slot(&slave_sc);
+						break;
+					default:
+						slave_scIface_raise_slave_slot(&slave_sc,slot_num);
+						break;
+					}
 				}
+				debugWireClear();
 			}
-			if ((ms+6) % SLOT_LENGTH == 0){
-				slot_num = ((ms+6) / SLOT_LENGTH) % SLOT_NUMBER;
-				if (master) {
-					//master_scIface_raise_tdma_slot_prepare(&master_sc, slot_num);
-				}else{
-					slave_scIface_raise_tdma_slot_prepare(&slave_sc, slot_num);
-				}
-			}
+
 		}
 		/*NIRQ is active low*/
 		if(0 == ezradio_hal_NirqLevel()){
@@ -107,24 +147,18 @@ int main(void) {
 				}
 			}
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_PACKET_RX_PEND_BIT){
+				debugWireSet();
+				debugWireClear();
+				debugWireSet();
 				ezradio_read_rx_fifo(64, rx_packet);
-				printf("pktRX:");
-				int i;
-				for(i = 0; i<64; i++){
-					/* convert bytes to ascii hex*/
-					char high = (rx_packet[i] >> 4) + '0';
-					char low = (rx_packet[i] & 0xF) + '0';
-					if(high > '9') high += 7;
-					if(low > '9') low += 7;
-					RETARGET_WriteChar(high);
-					RETARGET_WriteChar(low);
-				}
-				printf("\n");
+				debugWireClear();
+				debugWireSet();
 				if (master) {
-					master_scIface_raise_packet_received(&master_sc,s_ts_to_int(s_clockGetTX_ts()));
+					master_scIface_raise_packet_received(&master_sc,s_ts_to_int(s_clockGetRX_ts()));
 				}else{
-					slave_scIface_raise_packet_received(&slave_sc,s_ts_to_int(s_clockGetTX_ts()));
+					slave_scIface_raise_packet_received(&slave_sc,s_ts_to_int(s_clockGetRX_ts()));
 				}
+				debugWireClear();
 			}
 			if(interrupt_status.GET_INT_STATUS.PH_PEND & EZRADIO_CMD_GET_INT_STATUS_REP_PH_PEND_CRC_ERROR_PEND_BIT){
 

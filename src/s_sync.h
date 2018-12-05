@@ -9,18 +9,28 @@
 
 void setup_prs();
 
+void dbgPrintStr(const char* string);
+void dbgPrintInt(const char* string,int64_t integer);
+void logPrint(int offset,int delay,int integral);
+
 void sendPacket(uint8_t* packet);
 void startRx();
 
 void setSourceAddress(uint8_t* packet, uint8_t address);
-void setPacketType(uint8_t* packet, uint8_t type);
-void setSyncTimeStamp(uint8_t* packet, int64_t timestamp);
-
 uint8_t getSourceAddress(uint8_t* packet);
+
+void setPacketType(uint8_t* packet, uint8_t type);
 uint8_t getPacketType(uint8_t* packet);
+
+void setSyncTimeStamp(uint8_t* packet, int64_t timestamp);
 int64_t getSyncTimeStamp(uint8_t* packet);
 
-void setDelayResp(uint8_t* packet, int32_t timestamp, uint8_t slave_index);
-int32_t getDelayResp(uint8_t* packet, uint8_t slave_index);
+void setDelayResp(uint8_t* packet, int32_t timestamp, int32_t slave_index);
+int32_t getDelayResp(uint8_t* packet, int32_t slave_slot);
+
+void setMeasurement(uint8_t* packet, int32_t measurement);
+int32_t getMeasurement(uint8_t* packet);
+
+
 
 #endif /* S_SYNC_H_ */

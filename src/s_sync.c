@@ -34,23 +34,27 @@ void setup_prs(){
 	GPIO_InputSenseSet(GPIO_INSENSE_PRS, GPIO_INSENSE_PRS);
 }
 
+void dbgPrintStr(const char* string){
+	printf("%s\r\n",string);
+}
+void dbgPrintInt(const char* string,int64_t integer){
+	if(integer> INT32_MAX){
+		printf("%s+++\r\n",string);
+	}else if(integer< INT32_MIN){
+		printf("%s---\r\n",string);
+	}else{
+		printf("%s%d\r\n",string,(int)integer);
+	}
+}
+
+void logPrint(int offset,int delay,int integral){
+	printf("%d, %d, %d     \r",offset,delay,integral);
+}
 
 void sendPacket(uint8_t* packet)
 {
 	ezradio_write_tx_fifo(64, packet);
 	ezradio_start_tx(0, 0x30, 0u);
-	printf("pktTX:");
-	int i;
-	for(i = 0; i<64;i++){
-		/* convert bytes to ascii hex*/
-		char high = (packet[i] >> 4) + '0';
-		char low = (packet[i] & 0xF) + '0';
-		if(high > '9') high += 7;
-		if(low > '9') low += 7;
-		RETARGET_WriteChar(high);
-		RETARGET_WriteChar(low);
-	}
-	printf("\n");
 	//ezradio_start_tx_fast();
 }
 
@@ -100,20 +104,36 @@ int64_t getSyncTimeStamp(uint8_t* packet){
 	return timestamp;
 }
 
-void setDelayResp(uint8_t* packet, int32_t timestamp, uint8_t slave_index){
-	uint8_t index = slave_index * 4 + 2;
-	packet[index+0] = (timestamp >> 4*3) & 0xFF;
-	packet[index+1] = (timestamp >> 4*2) & 0xFF;
-	packet[index+2] = (timestamp >> 4*1) & 0xFF;
-	packet[index+3] = (timestamp >> 4*0) & 0xFF;
+void setDelayResp(uint8_t* packet, int32_t timestamp, int32_t slave_slot){
+	uint8_t index = 2 + (slave_slot-2) * 4;
+	packet[index+0] = (timestamp >> 8*3) & 0xFF;
+	packet[index+1] = (timestamp >> 8*2) & 0xFF;
+	packet[index+2] = (timestamp >> 8*1) & 0xFF;
+	packet[index+3] = (timestamp >> 8*0) & 0xFF;
 }
 
-int32_t getDelayResp(uint8_t* packet, uint8_t slave_index){
-	uint8_t index = slave_index * 4 + 2;
+int32_t getDelayResp(uint8_t* packet, int32_t slave_slot){
+	uint8_t index = 2 + (slave_slot-2) * 4;
 	int32_t timestamp;
-	timestamp  = (uint32_t)packet[index+0] << 4*3;
-	timestamp |= (uint32_t)packet[index+1] << 4*2;
-	timestamp |= (uint32_t)packet[index+2] << 4*1;
-	timestamp |= (uint32_t)packet[index+3] << 4*0;
+	timestamp  = (uint32_t)packet[index+0] << 8*3;
+	timestamp |= (uint32_t)packet[index+1] << 8*2;
+	timestamp |= (uint32_t)packet[index+2] << 8*1;
+	timestamp |= (uint32_t)packet[index+3] << 8*0;
 	return timestamp;
+}
+
+void setMeasurement(uint8_t* packet, int32_t measurement){
+	packet[2+0] = (measurement >> 8*3) & 0xFF;
+	packet[2+1] = (measurement >> 8*2) & 0xFF;
+	packet[2+2] = (measurement >> 8*1) & 0xFF;
+	packet[2+3] = (measurement >> 8*0) & 0xFF;
+}
+
+int32_t getMeasurement(uint8_t* packet){
+	int32_t measurement;
+	measurement  = (uint32_t)packet[2+0] << 8*3;
+	measurement |= (uint32_t)packet[2+1] << 8*2;
+	measurement |= (uint32_t)packet[2+2] << 8*1;
+	measurement |= (uint32_t)packet[2+3] << 8*0;
+	return measurement;
 }

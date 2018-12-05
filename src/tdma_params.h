@@ -9,7 +9,7 @@
 #define MODEL_TDMA_PARAMS_H_
 
 #define SLOT_NUMBER 16
-#define SLOT_LENGTH 32 //ms
+#define SLOT_LENGTH 16 //ms
 #define FRAME_LENGTH (SLOT_NUMBER * SLOT_LENGTH)
 #define MAX_SLAVE_NUMBER (SLOT_NUMBER-2)
 

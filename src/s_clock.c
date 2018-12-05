@@ -132,10 +132,9 @@ void s_clockAddInt(int64_t clock_tick){
 	if (tick >= 0){
 		estimated_offset += fixedpt_fromint(tick);
 	}else{
-		estimated_offset += fixedpt_fromint(CLOCK_FREQUENCY_KHZ + tick);
 		millisecs--;
+		estimated_offset += fixedpt_fromint(CLOCK_FREQUENCY_KHZ + tick);
 	}
-
 }
 
 s_timeStamp s_clockGetRX_ts() {

@@ -3,12 +3,12 @@
 #define SLAVE_SC_H_
 
 #include "sc_types.h"
-#include <s_clock.h>
-#include <controller.h>
-#include "..\model\slave.h"
 #include <s_sync.h>
+#include <controller.h>
+#include <s_clock.h>
 #include <fixedptc.h>
 #include <tdma_params.h>
+#include "..\model\slave.h"
 
 #ifdef __cplusplus
 extern "C" { 
@@ -24,48 +24,24 @@ extern "C" {
 #define SC_INVALID_EVENT_VALUE 0
 #endif
 /*! Define dimension of the state configuration vector for orthogonal states. */
-#define SLAVE_SC_MAX_ORTHOGONAL_STATES 4
+#define SLAVE_SC_MAX_ORTHOGONAL_STATES 3
 
 
 /*! Define indices of states in the StateConfVector */
 #define SCVI_SLAVE_SC_MAIN_REGION_INIT 0
 #define SCVI_SLAVE_SC_MAIN_REGION_WAIT_FOR_FOLLOWUP 0
 #define SCVI_SLAVE_SC_MAIN_REGION_CYCLE 0
-#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_TBMA_ACTIVE 0
-#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_RESPONSE_RESPONSE 1
-#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_RESPONSE_TIMEDIFF 1
-#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_SYNC_WAIT_FOR_SYNC 2
-#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_FOLLOWUP_WAIT_FOR_2_FOLLOWUP 3
-#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_FOLLOWUP_WAIT 3
+#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_RESPONSE_RESPONSE 0
+#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_RESPONSE_TIMEDIFF 0
+#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_SYNC_WAIT_FOR_SYNC 1
+#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_SYNC_WAIT_FOR_SYNC_SLOT 1
+#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_FOLLOWUP_WAIT 2
+#define SCVI_SLAVE_SC_MAIN_REGION_CYCLE_FOLLOWUP_WAIT_FOR_FUP_SLOT 2
 #define SCVI_SLAVE_SC_MAIN_REGION_WAIT_FOR_SYNC 0
+#define SCVI_SLAVE_SC_MAIN_REGION_WAIT_FOR_SYNC_1 0
+#define SCVI_SLAVE_SC_MAIN_REGION_WAIT_FOR_FUP 0
 
 
-/*
- * Enum of event names in the statechart.
- */
-typedef enum  {
-	slave_sc_invalid_event = SC_INVALID_EVENT_VALUE,
-	slave_scInternal_slave_slot,
-	slave_scInternal_sync_slot,
-	slave_scInternal_followup_slot
-} slave_sc_event_name;
-
-/*
- * Struct that represents a single event.
- */
-typedef struct {
-	slave_sc_event_name name;
-} slave_sc_internal_event;
-
-/*
- * Queue that holds the raised events.
- */
-typedef struct slave_sc_eventqueue_s {
-	slave_sc_internal_event events[SLAVE_SC_EVENTQUEUE_BUFFERSIZE];
-	sc_integer pop_index;
-	sc_integer push_index;
-	sc_integer size;
-} slave_sc_eventqueue;
 /*! Enumeration of all states */ 
 typedef enum
 {
@@ -73,13 +49,15 @@ typedef enum
 	Slave_sc_main_region_init,
 	Slave_sc_main_region_wait_for_followup,
 	Slave_sc_main_region_cycle,
-	Slave_sc_main_region_cycle_tbma_active,
 	Slave_sc_main_region_cycle_response_response,
 	Slave_sc_main_region_cycle_response_timediff,
 	Slave_sc_main_region_cycle_sync_wait_for_sync,
-	Slave_sc_main_region_cycle_followup_wait_for_2_followup,
+	Slave_sc_main_region_cycle_sync_wait_for_sync_slot,
 	Slave_sc_main_region_cycle_followup_wait,
-	Slave_sc_main_region_wait_for_sync
+	Slave_sc_main_region_cycle_followup_wait_for_fup_slot,
+	Slave_sc_main_region_wait_for_sync,
+	Slave_sc_main_region_wait_for_sync_1,
+	Slave_sc_main_region_wait_for_fup
 } Slave_scStates;
 
 
@@ -101,12 +79,13 @@ typedef struct
 	int64_t packet_sent_value;
 	sc_boolean packet_received_raised;
 	int64_t packet_received_value;
-	sc_boolean tdma_slot_raised;
-	uint8_t tdma_slot_value;
-	sc_boolean tdma_slot_prepare_raised;
-	uint8_t tdma_slot_prepare_value;
+	sc_boolean slave_slot_raised;
+	int32_t slave_slot_value;
+	sc_boolean sync_slot_raised;
+	sc_boolean followup_slot_raised;
 	uint8_t * rx_packet;
-	uint8_t slave_index;
+	uint8_t own_id;
+	int32_t own_slot;
 } Slave_scIface;
 
 
@@ -114,9 +93,7 @@ typedef struct
 /*! Type definition of the data structure for the Slave_scInternal interface scope. */
 typedef struct
 {
-	sc_boolean slave_slot_raised;
-	sc_boolean sync_slot_raised;
-	sc_boolean followup_slot_raised;
+	int32_t good_sync;
 	int64_t sync_tx_ts;
 	int64_t sync_rx_ts;
 	int32_t slave_time_diff;
@@ -141,7 +118,6 @@ typedef struct
 	
 	Slave_scIface iface;
 	Slave_scInternal internal;
-	slave_sc_eventqueue internal_event_queue;
 } Slave_sc;
 
 
@@ -165,20 +141,27 @@ extern void slave_scIface_raise_packet_sent(Slave_sc* handle, int64_t value);
 /*! Raises the in event 'packet_received' that is defined in the default interface scope. */ 
 extern void slave_scIface_raise_packet_received(Slave_sc* handle, int64_t value);
 
-/*! Raises the in event 'tdma_slot' that is defined in the default interface scope. */ 
-extern void slave_scIface_raise_tdma_slot(Slave_sc* handle, uint8_t value);
+/*! Raises the in event 'slave_slot' that is defined in the default interface scope. */ 
+extern void slave_scIface_raise_slave_slot(Slave_sc* handle, int32_t value);
 
-/*! Raises the in event 'tdma_slot_prepare' that is defined in the default interface scope. */ 
-extern void slave_scIface_raise_tdma_slot_prepare(Slave_sc* handle, uint8_t value);
+/*! Raises the in event 'sync_slot' that is defined in the default interface scope. */ 
+extern void slave_scIface_raise_sync_slot(Slave_sc* handle);
+
+/*! Raises the in event 'followup_slot' that is defined in the default interface scope. */ 
+extern void slave_scIface_raise_followup_slot(Slave_sc* handle);
 
 /*! Gets the value of the variable 'rx_packet' that is defined in the default interface scope. */ 
 extern uint8_t * slave_scIface_get_rx_packet(const Slave_sc* handle);
 /*! Sets the value of the variable 'rx_packet' that is defined in the default interface scope. */ 
 extern void slave_scIface_set_rx_packet(Slave_sc* handle, uint8_t * value);
-/*! Gets the value of the variable 'slave_index' that is defined in the default interface scope. */ 
-extern uint8_t slave_scIface_get_slave_index(const Slave_sc* handle);
-/*! Sets the value of the variable 'slave_index' that is defined in the default interface scope. */ 
-extern void slave_scIface_set_slave_index(Slave_sc* handle, uint8_t value);
+/*! Gets the value of the variable 'own_id' that is defined in the default interface scope. */ 
+extern uint8_t slave_scIface_get_own_id(const Slave_sc* handle);
+/*! Sets the value of the variable 'own_id' that is defined in the default interface scope. */ 
+extern void slave_scIface_set_own_id(Slave_sc* handle, uint8_t value);
+/*! Gets the value of the variable 'own_slot' that is defined in the default interface scope. */ 
+extern int32_t slave_scIface_get_own_slot(const Slave_sc* handle);
+/*! Sets the value of the variable 'own_slot' that is defined in the default interface scope. */ 
+extern void slave_scIface_set_own_slot(Slave_sc* handle, int32_t value);
 
 /*!
  * Checks whether the state machine is active (until 2.4.1 this method was used for states).
