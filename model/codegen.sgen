@@ -3,7 +3,7 @@ GeneratorModel for yakindu::c {
 	statechart master_sc {
 
 		feature Outlet {
-			targetProject = "test"
+			targetProject = "s_clock_sync"
 			targetFolder = "src-gen"
 			libraryTargetFolder = "src-gen"
 		}
@@ -11,7 +11,7 @@ GeneratorModel for yakindu::c {
 	statechart slave_sc {
 
 		feature Outlet {
-			targetProject = "test"
+			targetProject = "s_clock_sync"
 			targetFolder = "src-gen"
 			libraryTargetFolder = "src-gen"
 		}
