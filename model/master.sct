@@ -36,7 +36,7 @@
             <outgoingTransitions xmi:id="_KxpKIOxCEei9Z-dSG4d6KQ" specification="slave_slot" target="_UGJ8sOvlEeiP3IAYXHZaiA"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_UGJ8sOvlEeiP3IAYXHZaiA" specification="entry/&#xD;&#xA;startRx();&#xD;&#xA;relative_slave_ts=0;&#xD;&#xA;setDelayResp(sync_packet,0,valueof(slave_slot))" name="start lave slot" incomingTransitions="_KxpKIOxCEei9Z-dSG4d6KQ _fi9AcOxDEei9Z-dSG4d6KQ">
-            <outgoingTransitions xmi:id="_nXE5gOxCEei9Z-dSG4d6KQ" specification="packet_received/ &#xD;&#xA;relative_slave_ts=&#xD;&#xA;&#x9;(valueof(packet_received)-sync_tx_ts) as int32_t;&#xD;&#xA;setDelayResp(sync_packet, relative_slave_ts,valueof(slave_slot));&#xD;&#xA;logPrint(getSourceAddress(rx_packet),getMeasurement(rx_packet),0);&#xD;&#xA;dbgPrintStr(&quot;&quot;)" target="_SNys4OvlEeiP3IAYXHZaiA"/>
+            <outgoingTransitions xmi:id="_nXE5gOxCEei9Z-dSG4d6KQ" specification="packet_received/ &#xD;&#xA;relative_slave_ts=&#xD;&#xA;&#x9;(valueof(packet_received)-sync_tx_ts) as int32_t;&#xD;&#xA;setDelayResp(sync_packet, relative_slave_ts,valueof(slave_slot));&#xD;&#xA;sensorPrint(getSourceAddress(rx_packet),getMeasurement(rx_packet))" target="_SNys4OvlEeiP3IAYXHZaiA"/>
             <outgoingTransitions xmi:id="_fi9AcOxDEei9Z-dSG4d6KQ" specification="slave_slot" target="_UGJ8sOvlEeiP3IAYXHZaiA"/>
             <outgoingTransitions xmi:id="_vD7bAOxDEei9Z-dSG4d6KQ" specification="followup_slot" target="_SNys4OvlEeiP3IAYXHZaiA"/>
           </vertices>

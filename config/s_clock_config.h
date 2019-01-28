@@ -39,6 +39,21 @@
   .coist     = false,                    \
   .outInvert = false                     \
 }
+
+#define S_CLOCK_TIMER_INITCC2            \
+(TIMER_InitCC_TypeDef){                  \
+  .eventCtrl = timerEventRising,         \
+  .edge      = timerEdgeRising,         \
+  .prsSel    = timerPRSSELCh2,           \
+  .cufoa     = timerOutputActionNone,    \
+  .cofoa     = timerOutputActionNone,    \
+  .cmoa      = timerOutputActionNone,    \
+  .mode      = timerCCModeCapture,       \
+  .filter    = false,                    \
+  .prsInput  = true,                     \
+  .coist     = false,                    \
+  .outInvert = false                     \
+}
 /*
 #define S_CLOCK_TIMER_INITCC2            \
 (TIMER_InitCC_TypeDef){                  \

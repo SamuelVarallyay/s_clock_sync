@@ -7,6 +7,7 @@
 static volatile int64_t millisecs = 0;
 static volatile s_timeStamp rx_time_stamp;
 static volatile s_timeStamp tx_time_stamp;
+static volatile s_timeStamp sensor_time_stamp;
 static volatile int32_t div = CLOCK_FREQUENCY_KHZ;
 
 static volatile fixedpt drift_per_milliseconds = 0;
@@ -18,6 +19,7 @@ __STATIC_INLINE uint32_t TIMER_CaptureBufGet(TIMER_TypeDef *timer,
 }
 
 volatile bool ovf_int = false;
+volatile bool sensor_int = false;
 
 void s_clockInit() {
 	CMU_ClockEnable(cmuClock_S_CLOCK_TIMER, true);
@@ -42,7 +44,7 @@ void s_clockInit() {
 	TIMER_TopSet(S_CLOCK_TIMER, CLOCK_FREQUENCY_KHZ - 1);
 
 	TIMER_IntEnable(S_CLOCK_TIMER,
-	TIMER_IEN_OF | TIMER_IEN_CC0 | TIMER_IEN_CC1);
+	TIMER_IEN_OF | TIMER_IEN_CC0 | TIMER_IEN_CC1 | TIMER_IEN_CC2);
 
 	NVIC_EnableIRQ(S_CLOCK_TIMER_IRQn);
 
@@ -50,13 +52,14 @@ void s_clockInit() {
 
 void S_CLOCK_TIMER_IRQHandler(void) {
 
-	uint16_t intFlags = TIMER_IntGet(S_CLOCK_TIMER);
+	uint16_t intFlags = TIMER_IntGetEnabled(S_CLOCK_TIMER);
 
-	TIMER_IntClear(S_CLOCK_TIMER, TIMER_IFC_OF | TIMER_IFC_CC0 | TIMER_IFC_CC1);
+	TIMER_IntClear(S_CLOCK_TIMER, TIMER_IFC_OF | TIMER_IFC_CC0 | TIMER_IFC_CC1 | TIMER_IFC_CC2);
 
 	bool overflow = intFlags & TIMER_IF_OF;
 	bool capture_rx = intFlags & TIMER_IF_CC0;
 	bool capture_tx = intFlags & TIMER_IF_CC1;
+	bool capture_sensor = intFlags & TIMER_IF_CC2;
 
 	if (capture_rx) {
 		rx_time_stamp.ms_whole = millisecs;
@@ -67,6 +70,13 @@ void S_CLOCK_TIMER_IRQHandler(void) {
 		tx_time_stamp.ms_whole = millisecs;
 		tx_time_stamp.ms_numerator = TIMER_CaptureBufGet(S_CLOCK_TIMER, 1);
 		tx_time_stamp.ms_denominator = div;
+	}
+	if (capture_sensor) {
+		sensor_time_stamp.ms_whole = millisecs;
+		sensor_time_stamp.ms_numerator = TIMER_CaptureBufGet(S_CLOCK_TIMER, 2);
+		sensor_time_stamp.ms_denominator = div;
+		TIMER_IntDisable(S_CLOCK_TIMER,TIMER_IEN_CC2);
+		sensor_int = true;
 	}
 	if (overflow) {
 		ovf_int = true;
@@ -145,6 +155,17 @@ s_timeStamp s_clockGetTX_ts() {
 	return tx_time_stamp;
 }
 
+s_timeStamp s_clockGetSensor_ts() {
+	s_timeStamp ret;
+	if (sensor_int){
+		ret = sensor_time_stamp;
+		sensor_int = false;
+		TIMER_IntEnable(S_CLOCK_TIMER,TIMER_IEN_CC2);
+	} else{
+		ret = (s_timeStamp){0,0,1};
+	}
+	return ret;
+}
 
 
 int64_t s_clockGetMillisecs() {

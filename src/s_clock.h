@@ -23,6 +23,7 @@ void s_clockAddInt(int64_t tick);
 int64_t s_clockGetMillisecs();
 s_timeStamp s_clockGetTX_ts();
 s_timeStamp s_clockGetRX_ts();
+s_timeStamp s_clockGetSensor_ts();
 
 static inline int64_t s_ts_to_int(s_timeStamp a){
 	int64_t int_a = (int64_t)(((int64_t)a.ms_numerator * CLOCK_FREQUENCY_KHZ)/a.ms_denominator);

@@ -4,11 +4,11 @@
 
 #include "sc_types.h"
 #include <s_sync.h>
-#include <controller.h>
+#include "..\model\slave.h"
 #include <s_clock.h>
+#include <controller.h>
 #include <fixedptc.h>
 #include <tdma_params.h>
-#include "..\model\slave.h"
 
 #ifdef __cplusplus
 extern "C" { 
@@ -86,6 +86,7 @@ typedef struct
 	uint8_t * rx_packet;
 	uint8_t own_id;
 	int32_t own_slot;
+	int64_t sensor_ts;
 } Slave_scIface;
 
 
@@ -162,6 +163,10 @@ extern void slave_scIface_set_own_id(Slave_sc* handle, uint8_t value);
 extern int32_t slave_scIface_get_own_slot(const Slave_sc* handle);
 /*! Sets the value of the variable 'own_slot' that is defined in the default interface scope. */ 
 extern void slave_scIface_set_own_slot(Slave_sc* handle, int32_t value);
+/*! Gets the value of the variable 'sensor_ts' that is defined in the default interface scope. */ 
+extern int64_t slave_scIface_get_sensor_ts(const Slave_sc* handle);
+/*! Sets the value of the variable 'sensor_ts' that is defined in the default interface scope. */ 
+extern void slave_scIface_set_sensor_ts(Slave_sc* handle, int64_t value);
 
 /*!
  * Checks whether the state machine is active (until 2.4.1 this method was used for states).

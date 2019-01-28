@@ -135,6 +135,7 @@ void slave_sc_init(Slave_sc* handle)
 		/* Default init sequence for statechart slave_sc */
 		handle->iface.own_id = 0;
 		handle->iface.own_slot = 0;
+		handle->iface.sensor_ts = 0;
 		handle->internal.good_sync = 0;
 		handle->internal.sync_tx_ts = 0;
 		handle->internal.sync_rx_ts = 0;
@@ -383,6 +384,14 @@ void slave_scIface_set_own_slot(Slave_sc* handle, int32_t value)
 {
 	handle->iface.own_slot = value;
 }
+int64_t slave_scIface_get_sensor_ts(const Slave_sc* handle)
+{
+	return handle->iface.sensor_ts;
+}
+void slave_scIface_set_sensor_ts(Slave_sc* handle, int64_t value)
+{
+	handle->iface.sensor_ts = value;
+}
 
 /* implementations of all internal functions */
 
@@ -560,6 +569,7 @@ static void effect_main_region_cycle_sync_wait_for_sync_slot_tr0(Slave_sc* handl
 {
 	exseq_main_region_cycle_sync_wait_for_sync_slot(handle);
 	startRx();
+	setMeasurement(tx_packet, handle->iface.sensor_ts);
 	enseq_main_region_cycle_sync_wait_for_sync_default(handle);
 }
 
@@ -571,7 +581,6 @@ static void effect_main_region_cycle_followup_wait_tr0(Slave_sc* handle)
 	handle->internal.drift = PIcontroller(&(handle->internal.PIctrl), (((float) handle->internal.offset)) / FRAME_LENGTH);
 	s_clockDriftCorrection(fixedpt_fromxfloat(-handle->internal.drift));
 	logPrint(handle->internal.offset, handle->internal.delay, ((int32_t) (handle->internal.PIctrl.I * 1000)));
-	setMeasurement(tx_packet, ((int32_t) handle->internal.offset));
 	enseq_main_region_cycle_followup_wait_for_fup_slot_default(handle);
 }
 

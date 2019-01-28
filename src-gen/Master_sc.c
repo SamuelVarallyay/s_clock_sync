@@ -366,8 +366,7 @@ static void effect_main_region_sync_slave_start_lave_slot_tr0(Master_sc* handle)
 	exseq_main_region_sync_slave_start_lave_slot(handle);
 	handle->internal.relative_slave_ts = ((int32_t) (handle->iface.packet_received_value - handle->internal.sync_tx_ts));
 	setDelayResp(sync_packet, handle->internal.relative_slave_ts, handle->iface.slave_slot_value);
-	logPrint(getSourceAddress(handle->iface.rx_packet), getMeasurement(handle->iface.rx_packet), 0);
-	dbgPrintStr("");
+	sensorPrint(getSourceAddress(handle->iface.rx_packet), getMeasurement(handle->iface.rx_packet));
 	enseq_main_region_sync_slave_wait_slave_default(handle);
 }
 

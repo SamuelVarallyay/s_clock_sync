@@ -12,6 +12,7 @@ void setup_prs();
 void dbgPrintStr(const char* string);
 void dbgPrintInt(const char* string,int64_t integer);
 void logPrint(int offset,int delay,int integral);
+void sensorPrint(int source, int64_t timestamp);
 
 void sendPacket(uint8_t* packet);
 void startRx();
@@ -28,8 +29,8 @@ int64_t getSyncTimeStamp(uint8_t* packet);
 void setDelayResp(uint8_t* packet, int32_t timestamp, int32_t slave_index);
 int32_t getDelayResp(uint8_t* packet, int32_t slave_slot);
 
-void setMeasurement(uint8_t* packet, int32_t measurement);
-int32_t getMeasurement(uint8_t* packet);
+#define setMeasurement(packet, ts) setSyncTimeStamp(packet, ts)
+#define getMeasurement(packet) getSyncTimeStamp(packet)
 
 
 

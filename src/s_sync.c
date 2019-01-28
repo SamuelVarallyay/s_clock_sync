@@ -7,6 +7,7 @@
 #include "s_radio.h"
 #include "s_sync.h"
 #include "retargetserial.h"
+#include "bspconfig.h"
 #include <stdio.h>
 
 void setup_prs(){
@@ -17,6 +18,8 @@ void setup_prs(){
 	GPIO_PinModeSet((GPIO_Port_TypeDef) RF_GPIO0_PORT, RF_GPIO0_PIN, gpioModeInput, 0);
 	GPIO_PinModeSet((GPIO_Port_TypeDef) RF_GPIO1_PORT, RF_GPIO1_PIN, gpioModeInput, 0);
 
+	GPIO_PinModeSet((GPIO_Port_TypeDef) BSP_GPIO_PB0_PORT, BSP_GPIO_PB0_PIN, gpioModeInput, 0);
+
 	/* Pin PA0 and PA1 output the GPIO0 and GPIO1 via PRS to breakout pad*/
 	GPIO_PinModeSet(gpioPortA, 0, gpioModePushPull, 0);
 	GPIO_PinModeSet(gpioPortA, 1, gpioModePushPull, 0);
@@ -24,10 +27,12 @@ void setup_prs(){
 	/* Disable INT for PRS channels */
 	GPIO_IntConfig((GPIO_Port_TypeDef) RF_GPIO0_PORT, RF_GPIO0_PIN, false, false, false);
 	GPIO_IntConfig((GPIO_Port_TypeDef) RF_GPIO1_PORT, RF_GPIO1_PIN, false, false, false);
+	GPIO_IntConfig((GPIO_Port_TypeDef) BSP_GPIO_PB0_PORT, BSP_GPIO_PB0_PIN, false, false, false);
 
 	/* Setup PRS for RF GPIO pins  */
 	PRS_SourceAsyncSignalSet(0, PRS_CH_CTRL_SOURCESEL_GPIOH, PRS_CH_CTRL_SIGSEL_GPIOPIN15);
 	PRS_SourceAsyncSignalSet(1, PRS_CH_CTRL_SOURCESEL_GPIOH, PRS_CH_CTRL_SIGSEL_GPIOPIN14);
+	PRS_SourceAsyncSignalSet(2, PRS_CH_CTRL_SOURCESEL_GPIOL, PRS_CH_CTRL_SIGSEL_GPIOPIN3);
 	PRS ->ROUTE = (PRS_ROUTE_CH0PEN | PRS_ROUTE_CH1PEN);
 
 	/* Make sure PRS sensing is enabled (should be by default) */
@@ -49,6 +54,11 @@ void dbgPrintInt(const char* string,int64_t integer){
 
 void logPrint(int offset,int delay,int integral){
 	printf("%d, %d, %d     \r",offset,delay,integral);
+}
+void sensorPrint(int source, int64_t timestamp){
+	if (timestamp != 0){
+		printf("pir,%d,%d\r\n",source,(int)(timestamp/48000));
+	}
 }
 
 void sendPacket(uint8_t* packet)
@@ -122,18 +132,4 @@ int32_t getDelayResp(uint8_t* packet, int32_t slave_slot){
 	return timestamp;
 }
 
-void setMeasurement(uint8_t* packet, int32_t measurement){
-	packet[2+0] = (measurement >> 8*3) & 0xFF;
-	packet[2+1] = (measurement >> 8*2) & 0xFF;
-	packet[2+2] = (measurement >> 8*1) & 0xFF;
-	packet[2+3] = (measurement >> 8*0) & 0xFF;
-}
 
-int32_t getMeasurement(uint8_t* packet){
-	int32_t measurement;
-	measurement  = (uint32_t)packet[2+0] << 8*3;
-	measurement |= (uint32_t)packet[2+1] << 8*2;
-	measurement |= (uint32_t)packet[2+2] << 8*1;
-	measurement |= (uint32_t)packet[2+3] << 8*0;
-	return measurement;
-}

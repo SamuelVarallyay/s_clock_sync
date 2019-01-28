@@ -121,6 +121,7 @@ int main(void) {
 					case 0:
 						debugWireClear();
 						debugWireSet();
+						slave_scIface_set_sensor_ts(&slave_sc, s_ts_to_int(s_clockGetSensor_ts()));
 						slave_scIface_raise_sync_slot(&slave_sc);
 						break;
 					case 1:
